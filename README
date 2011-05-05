@@ -1,0 +1,48 @@
+----------------------------------------------------------------------------
+About:
+----------------------------------------------------------------------------
+Mind Rush is an obstacle avoidance game in the style of classic "boulder dodge" style games.
+
+What makes Mind Rush unique is that it supports bio-feedback control in the form of eye-movement and concentration.
+
+I created it as part of my Real World Measurements course as a Freshman at Franklin W. Olin College of Engineering.
+
+-Julian Ceipek
+
+----------------------------------------------------------------------------
+Basic Dependencies:
+----------------------------------------------------------------------------
+- Python 2.6 (other versions untested)
+- pygame
+
+----------------------------------------------------------------------------
+Running:
+----------------------------------------------------------------------------
+By default, Mind Rush will run as a basic, single-threaded python program.
+
+To run it, cd into ./old and run "python mindRush.py".
+
+Since it was created as a proof-of-concept HCI experiment within a very short timeframe, its bio-feedback features are difficult to set up and currently require specialized hardware and software. Please read old/Install.pdf to get started with these features.
+
+----------------------------------------------------------------------------
+Credits
+----------------------------------------------------------------------------
+EMG Circuit:
+- Heather Dudley
+- Chloe Vilain
+
+EEG Hack:
+Julian Ceipek
+Janice Guan
+
+Game R&D:
+Julian Ceipek
+
+Integration:
+Julian Ceipek
+
+----------------------------------------------------------------------------
+Source Code and Future:
+----------------------------------------------------------------------------
+The code in ./old is poorly designed, is difficult to extend, and has several bugs. Now that the project is over, I am rewriting Mind Rush from scratch with an extensible custom game engine for python, based on my work for the Complete Galactic Dominion RTS project. If I have time, I will try to reduce the hardware and software requirements for the bio-feedback parts of the project.
+-Julian Ceipek
