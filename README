@@ -27,18 +27,28 @@ Since it was created as a proof-of-concept HCI experiment within a very short ti
 ----------------------------------------------------------------------------
 Credits
 ----------------------------------------------------------------------------
-EMG Circuit:
+Initial EMG Circuit:
 - Heather Dudley
 - Chloe Vilain
 
-EEG Hack:
+Initial EEG Hack:
 - Julian Ceipek
 - Janice Guan
 
-Game R&D:
+Initial Game R&D:
 - Julian Ceipek
 
-Integration:
+Initial Integration:
+- Julian Ceipek
+
+New Circuit:
+- Patrick Varin
+
+New Game R&D:
+- Patrick Varin
+- Julian Ceipek
+
+New Integration:
 - Julian Ceipek
 
 ----------------------------------------------------------------------------
@@ -46,3 +56,11 @@ Source Code and Future:
 ----------------------------------------------------------------------------
 The code in ./old is poorly designed, is difficult to extend, and has several bugs. Now that the project is over, I am rewriting Mind Rush from scratch with an extensible custom game engine for python, based on my work for the Complete Galactic Dominion RTS project. If I have time, I will try to reduce the hardware and software requirements for the bio-feedback parts of the project.
 -Julian Ceipek
+
+----------------------------------------------------------------------------
+Updates:
+----------------------------------------------------------------------------
+5/7/11:
+- Patrick Varin and I are on our way to making an extensible architecture
+- On the hardware side, we are switching to using an Arduino for data acquisition
+- We intend to use a more powerful EMG circuit that Patrick Varin helped design
