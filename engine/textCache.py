@@ -1,7 +1,7 @@
 #
 # textCache.py
 #
-# Copyright (C)2011 Julian Ceipek
+# Copyright (C)2011 Julian Ceipek and Patrick Varin
 #
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
@@ -18,29 +18,16 @@ class TextCache:
     or text has to be rendered to a surface.
     """
     def __init__(self):
-        self.fonts = WeakKeyDictionary()
-        self.text = WeakKeyDictionary()
-        self.initialized = False
-        
-    def initialize(self):
-        for key in self.fonts.keys():
-            self.fonts[key].setObject(pygame.font.Font(key))
-        for key in self.text.keys():
-            font = self.getFont(key)
-            self.text[key].setObject(font.render(key[0], key[4], key[3], key[5]))
-            
+        self.fonts = {}#WeakKeyDictionary()
+        self.text = {}#WeakKeyDictionary()
 
     def getText(self, text, fontname, size,
                 color, antialias=False, bgColor=None):
         antialias = int(antialias)
-        if initialized:
-            if not (text, fontname, size, color, antialias, bgColor) in self.text:
-                font = self.getFont(fontname, size)
-                self.text[(text, fontname, size, color, antialias,
-                 bgColor)] = font.render(text, antialias, color, bgColor)
-        else:
-            if not (text, fontname, size, color, antialias, bgColor) in self.text:
-                self.text[(text, fontname, size, color, antialias, bgColor)] = PotentialObject()
+        if not (text, fontname, size, color, antialias, bgColor) in self.text:
+            font = self.getFont(fontname, size)
+            self.text[(text, fontname, size, color, antialias,
+             bgColor)] = font.render(text, antialias, color)
         return self.text[(text, fontname, size, color, antialias, bgColor)]
 
     def getTextHeight(self, text, fontname, size,
@@ -58,13 +45,8 @@ class TextCache:
         return textObject.get_rect().width
 
     def getFont(self, fontname, size):
-        if initialized:
-            if not (fontname, size) in self.fonts:
-                self.fonts[(fontname, size)] = pygame.font.Font(fontname, size)
-        else:
-            if not (fontname, size) in self.fonts:
-                self.fonts[(fontname, size)] = PotentialObject()
-
+        if not (fontname, size) in self.fonts:
+            self.fonts[(fontname, size)] = pygame.font.Font(fontname, size)
         return self.fonts[(fontname, size)]
 
     def clearText(self, text, fontname, size,

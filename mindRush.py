@@ -1,7 +1,7 @@
 #
 # mindRush.py
 #
-# Copyright (C)2011 Julian Ceipek
+# Copyright (C)2011 Julian Ceipek and Patrick Varin
 #
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
@@ -13,11 +13,18 @@ from engine.window import Window
 from screens import MenuScreen
 
 resolution = (640,480)
+#resolution = (1440,900)
+
+window = Window(resolution,
+        windowTitle="Mind Rush")
 
 manager = Manager()
+window.registerManager(manager)
+
 userInterface = UI(manager)
 #screens must be initialized after the manager and the ui
 mainScreen = MenuScreen(resolution, userInterface)
 userInterface.addActiveScreens(mainScreen)
-Window(manager,resolution,#(1440,900),
-        windowTitle="Mind Rush")
+
+window.run()
+window.cleanup()

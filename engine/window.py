@@ -1,7 +1,7 @@
 #
 # window.py
 #
-# Copyright (C)2011 Julian Ceipek
+# Copyright (C)2011 Julian Ceipek and Patrick Varin
 #
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
@@ -10,7 +10,7 @@ import pygame
 
 class Window:
 
-    def __init__(self, manager, resolution,
+    def __init__(self, resolution,
         windowTitle="Powered by engine"):
         """
         active
@@ -24,11 +24,8 @@ class Window:
         gameFrametime
         """
         self.active = True
-        self.registerWithManager(manager)
         self.resolution = resolution
         self.openPygame(windowTitle)
-        self.run()
-        self.cleanup()
 
     def openPygame(self,windowTitle):
         pygame.init()
@@ -38,12 +35,11 @@ class Window:
         self.maxFPS = 60
         self.gameTime = 0
         self.gameFrametime = 0
-        self.manager.setupWithWindow(self)
 
-    def registerWithManager(self,manager):
+    def registerManager(self, manager):
         self.manager = manager
-        manager.registerEventWithCallback(pygame.QUIT,
-            self.deactivate)
+        manager.registerEventWithCallback(pygame.QUIT, self.deactivate)
+        self.manager.setupWithWindow(self)
 
     def run(self):
 

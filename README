@@ -7,7 +7,7 @@ What makes Mind Rush unique is that it supports bio-feedback control in the form
 
 I created it as part of my Real World Measurements course as a Freshman at Franklin W. Olin College of Engineering.
 
--Julian Ceipek
+-Julian Ceipek and Patrick Varin
 
 ----------------------------------------------------------------------------
 Basic Dependencies:
@@ -32,17 +32,17 @@ EMG Circuit:
 - Chloe Vilain
 
 EEG Hack:
-- Julian Ceipek
+- Julian Ceipek and Patrick Varin
 - Janice Guan
 
 Game R&D:
-- Julian Ceipek
+- Julian Ceipek and Patrick Varin
 
 Integration:
-- Julian Ceipek
+- Julian Ceipek and Patrick Varin
 
 ----------------------------------------------------------------------------
 Source Code and Future:
 ----------------------------------------------------------------------------
 The code in ./old is poorly designed, is difficult to extend, and has several bugs. Now that the project is over, I am rewriting Mind Rush from scratch with an extensible custom game engine for python, based on my work for the Complete Galactic Dominion RTS project. If I have time, I will try to reduce the hardware and software requirements for the bio-feedback parts of the project.
--Julian Ceipek
+-Julian Ceipek and Patrick Varin

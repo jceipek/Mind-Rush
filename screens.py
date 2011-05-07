@@ -1,7 +1,7 @@
 #
 # screens.py
 #
-# Copyright (C)2011 Julian Ceipek
+# Copyright (C)2011 Julian Ceipek and Patrick Varin
 #
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
@@ -16,14 +16,15 @@ class MenuScreen(Screen):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
         MenuItem.textCache = Screen.textCache
-        
+        MenuItem.resolution = Screen.resolution
+
         self.menuItems = []
-        self.addMenuItem(MenuItem('Play'))
-        self.addMenuItem(MenuItem('Exit'))
+        self.addMenuItem(MenuItem('Play',(self.resolution[0]//2,int(self.resolution[1]*(1/3.0)))))
+        self.addMenuItem(MenuItem('Exit',(self.resolution[0]//2,self.resolution[1]//2)))
 
     def addMenuItem(self,item):
         self.menuItems.append(item)
-        
+
     def draw(self, surf):
         Screen.draw(self, surf)
         for menuItem in self.menuItems:
@@ -31,13 +32,23 @@ class MenuScreen(Screen):
 
 class MenuItem:
 
-    def __init__(self, text):
+    def __init__(self, text, pos):
         self.text = text
-        fontname = pathJoin(('fonts,orbitron,orbitron-black.ttf'))
-        self.textSurface = self.textCache.getText(text, fontname, 20, (255,)*3, antialias=True)
-        
+        self.position = list(pos)
+        self.fontname = pathJoin(('fonts','orbitron','orbitron-black.ttf'))
+        self.size = int(self.resolution[1]*(1/15.0))
+        self.color = (255,255,255)
+        self.antialias = True
+        self.textSurface = self.textCache.getText(text, self.fontname, self.size, self.color, antialias=self.antialias)
+
     def draw(self, surf):
-        surf.blit(self.textSurface,(0,0))
+        topleft = self.position
+        dy = -self.textCache.getTextHeight(self.text, self.fontname,
+                self.size, self.color, antialias=self.antialias)//2
+        dx = -self.textCache.getTextWidth(self.text, self.fontname,
+                self.size, self.color, antialias=self.antialias)//2
+        surf.blit(self.textSurface,
+                (self.position[0] + dx, self.position[1] + dy))
 
 
 class InputScreen(Screen):

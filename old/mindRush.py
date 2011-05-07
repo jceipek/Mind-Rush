@@ -2,7 +2,7 @@
 # Mind Rush!
 # A bio-feedback defense game written in Python, Java, and MATLAB
 #
-# Copyright (C)2011 Julian Ceipek
+# Copyright (C)2011 Julian Ceipek and Patrick Varin
 #
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
@@ -249,7 +249,7 @@ class Bar():
     Credits:
     ----------------------------------------------------------------
     From Complete-Galactic-Dominion's Overlay module, by
-    Julian Ceipek, Jared Kirschner, Patrick Varin, and Berit Johnson
+    Julian Ceipek and Patrick Varin, Jared Kirschner, Patrick Varin, and Berit Johnson
     """
     def __init__(self,maxValue,barWidth,barHeight,fullness=1.0,fullColor=(0,255,0),emptyColor=(255,0,0)):
         from pygame import Surface

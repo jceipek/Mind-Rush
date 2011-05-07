@@ -1,7 +1,7 @@
 #
 # manager.py
 #
-# Copyright (C)2011 Julian Ceipek
+# Copyright (C)2011 Julian Ceipek and Patrick Varin
 #
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
@@ -18,7 +18,7 @@ class Manager:
 
     def initializeCaches(self):
         Manager.textCache = TextCache()
-        
+
     def registerUI(self, ui):
         self._ui = ui
         self._ui.setCaches(textCache=self.textCache)
@@ -33,13 +33,13 @@ class Manager:
         """
         Give the manager various window properties needed by game objects
         """
-        pass
+        self.resolution = window.resolution
 
     def update(self, gameTime, gameFrametime):
-        self.ui.update(gameTime, gameFrametime)
+        self._ui.update(gameTime, gameFrametime)
 
     def draw(self, surf):
-        self.ui.draw(surf)
+        self._ui.draw(surf)
 
     def handle(self, event):
         """
