@@ -9,6 +9,7 @@
 import pygame
 
 from textCache import TextCache
+from continuousEvent import ContinuousEvent
 
 class Manager:
 
@@ -99,14 +100,13 @@ class Manager:
             
     def handleDiscrete(self, event):
         """
-        Handles discrete events, e.g. MOUSEBUTTONUP
+        Handles discrete events, e.g. mouse clicks and button presses
         """
         eventName = pygame.event.event_name(event.type)
         
         #catch events associated with only the types
         if eventName in self.eventTypeToString:
             string = self.eventTypeToString[eventName]
-            print 'Type',string
             if string in self.screenInputDict:
                 self.screenInputDict[string][1]()
         
@@ -122,7 +122,6 @@ class Manager:
                 
             if keyName in self.eventTypeToString:
                 string = self.eventTypeToString[keyName]
-                print 'Type',string
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1]()
                 
@@ -132,19 +131,31 @@ class Manager:
             buttonName = '%s_%d' % (eventName,event.button)
             if buttonName in self.eventTypeToString:
                 string = self.eventTypeToString[buttonName]
-                print 'Type',string
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1]()
             
         
     def handleContinuous(self, event):
         """
-        Handles continuous events, e.g. MOUSEMOTION
+        Handles absolute motion events, e.g. MOUSEMOTION
         """
-        if event.type == pygame.MOUSEMOTION:
-            #Send the correct screen a mousex and mousey pos in separate
-            #callbacks
-            pass
+        eventName = pygame.event.event_name(event.type)
+        
+        if eventName in self.eventTypeToString:
+            if hasattr(event,'rel')
+                string = self.eventTypeToString[eventName]
+                if string in self.screenInputDict:
+                    self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True))
+                    
+            if hasattr(event,'pos')
+                string = self.eventTypeToString[eventName]
+                if string in self.screenInputDict:
+                    self.screenInputDict[string][1](ContinuousEvent(event.pos))
+                    
+            if hasattr(event,'value')
+                string = self.eventTypeToString[eventName]
+                if string in self.screenInputDict:
+                    self.screenInputDict[string][1](ContinuousEvent(event.value))
 
     def post(self, event):
         pygame.event.post(Event)
