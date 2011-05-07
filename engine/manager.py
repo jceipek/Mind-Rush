@@ -48,5 +48,6 @@ class Manager:
         if event.type in self.inputDict:
             self.inputDict[event.type]()
 
+
     def post(self, event):
         pygame.event.post(Event)
