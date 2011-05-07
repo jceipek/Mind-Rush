@@ -8,12 +8,30 @@
 
 import pygame
 
-class Screen(pygame.Surface):
+from classMethod import ClassMethod
 
-    def __init__(self, background, size):
-        pygame.Surface.__init__(self)
+class Screen(pygame.Surface):
+    
+    def __init__(self, background, size, ui):
+        pygame.Surface.__init__(self, size)
+        if not hasattr(self,'textCache'):
+            Screen.setCaches(textCache=ui.textCache)
         self.background = background
         self.size = size #Should default to screen size if not specified
+        self.shouldUpdate = True
 
-    def draw(self):
-        pass
+    def draw(self, surf):
+        """
+        Draws the screen's background to the surface
+        Note: May be changed later to add foreground/override
+        """
+        self.background.draw(surf)
+
+    def setCaches(textCache=None):
+        """
+        Called in the init method to let screens make images, text, etc.
+        """
+        if textCache != None:
+            Screen.textCache = textCache
+            
+    setCaches = ClassMethod(setCaches)

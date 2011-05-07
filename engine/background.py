@@ -6,22 +6,21 @@
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
 
-import
-
 class Background:
     """
     A sprite group or solid color that is displayed on a screen.
     """
     def __init__(self, bg):
         self.bg = bg
+        self.isAnimated = hasattr(bg,'update')
 
 
     def draw(self, surf):
         if type(self.bg) == tuple:
             surf.fill(self.bg)
         else:
-            self.bg.draw()
+            self.bg.draw(surf)
 
-    def update(self):
-        if not type(self.bg) == tuple:
-            self.bg.update() #FIXME
+    def update(self, *args):
+        if self.isAnimated:
+            self.bg.update(*args) #FIXME
