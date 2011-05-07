@@ -50,7 +50,7 @@ class MindflexDevice:
 
         try:
             ser = serial.Serial('/dev/tty.usbmodem411', 9600)
-            time.sleep(3)
+            time.sleep(1)
         except:
             raise Exception("Unable to communicate with Arduino")
 
