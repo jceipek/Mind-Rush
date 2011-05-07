@@ -26,6 +26,9 @@ class Manager:
         self.inputDict[eventType] = callback
 
     def setupWithWindow(self, window):
+        """
+        Give the manager various window properties needed by game objects
+        """
         pass
 
     def update(self, gameTime, gameFrametime):

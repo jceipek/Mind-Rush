@@ -25,8 +25,8 @@ class TextCache:
         antialias = int(antialias)
         if not (text, fontname, size, color, antialias, bgColor) in self.text:
             font = self.getFont(fontname, size)
-            self.text[(text, fontname, size, color, antialias, bgColor)] =
-                        font.render(text, antialias, color, bgColor)
+            self.text[(text, fontname, size, color, antialias,
+             bgColor)] = font.render(text, antialias, color, bgColor)
         return self.text[(text, fontname, size, color, antialias, bgColor)]
 
     def getTextHeight(self, text, fontname, size,
@@ -47,7 +47,7 @@ class TextCache:
         if not (fontname, size) in self.fonts:
             self.fonts[(fontname, size)] = pygame.font.Font(fontname, size)
 
-        return self.fonts[(fontname, size)] = Font.render(text, antialias, color, background=None)
+        return self.fonts[(fontname, size)]
 
     def clearText(self, text, fontname, size,
                 color, antialias=False, bgColor=None):
@@ -59,9 +59,9 @@ class TextCache:
         Example: Call before a score counter gets updated.
         """
         if (text, fontname, size,
-                color, antialias=False, bgColor=None) in self.text:
+                color, antialias, bgColor) in self.text:
             del self.text[(text, fontname, size,
-                color, antialias=False, bgColor=None)]
+                color, antialias, bgColor)]
 
     def clearFont(self, fontname, size):
         """

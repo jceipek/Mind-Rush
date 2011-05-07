@@ -10,7 +10,7 @@ import pygame
 
 class Window:
 
-    def __init__(self,manager,resolution=(640,480),
+    def __init__(self, manager, resolution=(640, 480),
         windowTitle="Powered by engine"):
         """
         active

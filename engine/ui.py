@@ -10,3 +10,6 @@ class UI:
 
     def __init__(self):
         self.activeScreen = None
+        
+    def setActiveScreen(self, screen):
+        self.activeScreen = screen
