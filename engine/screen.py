@@ -21,6 +21,7 @@ class Screen(pygame.Surface):
         self.background = background
         self.size = size #Should default to screen size if not specified
         self.shouldUpdate = True
+        self.callbackDict = {}
 
     def draw(self, surf):
         """
@@ -38,5 +39,13 @@ class Screen(pygame.Surface):
 
     def update(self, *args):
         pass
+        
+    def getCallbackDict(self):
+        """
+        Used to pass callbacks to the manager.
+        The dictionary maps
+            configString : (deviceString, callback)
+        """
+        return self.callbackDict
 
     setCaches = ClassMethod(setCaches)

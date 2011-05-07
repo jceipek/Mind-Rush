@@ -17,6 +17,9 @@ class MenuScreen(Screen):
         Screen.__init__(self, background, size, ui)
         MenuItem.textCache = Screen.textCache
         MenuItem.resolution = Screen.resolution
+        
+        self.callbackDict = {}
+        self.callbackDict['fire'] = ('deviceString', self.fire)
 
         self.menuItems = []
         self.addMenuItem(MenuItem('Play',(self.resolution[0]//2,int(self.resolution[1]*(1/3.0)))))
@@ -29,6 +32,9 @@ class MenuScreen(Screen):
         Screen.draw(self, surf)
         for menuItem in self.menuItems:
             menuItem.draw(surf)
+            
+    def fire(self):
+        print 'fire'
 
 class MenuItem:
 

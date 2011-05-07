@@ -57,7 +57,7 @@ class Window:
             self.gameFrametime = self.gameClock.tick(self.maxFPS)
             self.gameTime += self.gameFrametime
 
-    def deactivate(self):
+    def deactivate(self, event):
         self.active = False
 
     def cleanup(self):

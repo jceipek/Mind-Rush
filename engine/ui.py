@@ -25,17 +25,23 @@ class UI:
             screens = [screens]
 
         self.activeScreens.append(*screens)
+        self._manager.setScreenInputDict(self.activeScreens[-1].getCallbackDict())
 
     def clearActiveScreens(self, screens):
         """
         Removes all of the screens from view
         """
         self.activeScreens = []
+        self._manager.setScreenInputDict({})
 
     def clearTopScreen(self):
         """
         Removes the top screen from view and returns it
         """
+        if len(self.activeScreens)>1:
+            self._manager.setScreenInputDict(self.activeScreens[-2].getCallbackDict())
+        else:
+            self._manager.setScreenInputDict({})
         return self.activeScreens.pop()
 
     def draw(self, surf):
