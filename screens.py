@@ -20,6 +20,7 @@ class MenuScreen(Screen):
         
         self.callbackDict = {}
         self.callbackDict['fire'] = ('deviceString', self.fire)
+        self.callbackDict['joyFire'] = ('deviceString', self.joyFire)
 
         self.menuItems = []
         self.addMenuItem(MenuItem('Play',(self.resolution[0]//2,int(self.resolution[1]*(1/3.0)))))
@@ -35,6 +36,9 @@ class MenuScreen(Screen):
             
     def fire(self):
         print 'fire'
+
+    def joyFire(self):
+        print 'joystick Fire'
 
 class MenuItem:
 

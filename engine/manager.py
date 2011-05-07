@@ -142,17 +142,18 @@ class Manager:
         eventName = pygame.event.event_name(event.type)
         
         if eventName in self.eventTypeToString:
-            if hasattr(event,'rel')
+            if hasattr(event,'rel'):
                 string = self.eventTypeToString[eventName]
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True))
+                print 'relative movement',event.rel
                     
-            if hasattr(event,'pos')
+            if hasattr(event,'pos'):
                 string = self.eventTypeToString[eventName]
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1](ContinuousEvent(event.pos))
                     
-            if hasattr(event,'value')
+            if hasattr(event,'value'):
                 string = self.eventTypeToString[eventName]
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1](ContinuousEvent(event.value))
