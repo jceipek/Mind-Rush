@@ -6,10 +6,14 @@
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
 
-class Screen:
+import pygame
 
-    def __init__(self):
-        pass
+class Screen(pygame.Surface):
+
+    def __init__(self, background, size):
+        pygame.Surface.__init__(self)
+        self.background = background
+        self.size = size #Should default to screen size if not specified
 
     def draw(self):
         pass
