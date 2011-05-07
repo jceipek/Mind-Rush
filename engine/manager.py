@@ -12,12 +12,16 @@ from textCache import TextCache
 
 class Manager:
 
-    def __init__(self,ui):
+    def __init__(self):
         self.inputDict = {}
-        self.ui = ui
+        self.initializeCaches()
 
-    def initializeCaches():
-        self.textCache = textCache
+    def initializeCaches(self):
+        Manager.textCache = TextCache()
+        
+    def registerUI(self, ui):
+        self._ui = ui
+        self._ui.setCaches(textCache=self.textCache)
 
     def registerEventWithCallback(self, eventType, callback):
         """
@@ -32,10 +36,10 @@ class Manager:
         pass
 
     def update(self, gameTime, gameFrametime):
-        pass
+        self.ui.update(gameTime, gameFrametime)
 
-    def draw(self):
-        pass
+    def draw(self, surf):
+        self.ui.draw(surf)
 
     def handle(self, event):
         """

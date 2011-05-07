@@ -10,7 +10,7 @@ import pygame
 
 class Window:
 
-    def __init__(self, manager, resolution=(640, 480),
+    def __init__(self, manager, resolution,
         windowTitle="Powered by engine"):
         """
         active
@@ -54,7 +54,7 @@ class Window:
             self.displaySurface.fill((0,0,0)) #should go in manager
 
             self.manager.update(self.gameTime, self.gameFrametime)
-            self.manager.draw()
+            self.manager.draw(self.displaySurface)
 
             pygame.display.flip()
 
