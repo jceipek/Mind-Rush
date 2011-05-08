@@ -21,6 +21,9 @@ class Screen(pygame.Surface):
         self.background = background
         self.size = size #Should default to screen size if not specified
         self.shouldUpdate = True
+        self.initializeCallbackDict()
+        
+    def initializeCallbackDict(self):
         self.callbackDict = {}
 
     def draw(self, surf):
