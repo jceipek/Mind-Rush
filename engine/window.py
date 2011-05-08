@@ -11,7 +11,7 @@ import pygame
 class Window:
 
     def __init__(self, resolution,
-        windowTitle="Powered by engine", altInput=None):
+        windowTitle="Powered by engine"):
         """
         active
         manager
@@ -26,7 +26,7 @@ class Window:
         self.active = True
         self.resolution = resolution
         self.openPygame(windowTitle)
-        self.altInput = altInput
+        self.altInput = []
 
     def openPygame(self,windowTitle):
         pygame.init()
@@ -42,12 +42,15 @@ class Window:
         manager.registerEventWithCallback(pygame.QUIT, self.deactivate)
         self.manager.setupWithWindow(self)
 
+    def addInputDevice(self, device):
+        self.altInput.append(device)
+
     def run(self):
 
         while self.active:
-            if not self.altInput == None:
-                if self.altInput.poll():
-                    newEvent = self.altInput.getEvent()
+            for device in self.altInput:
+                if device.poll():
+                    newEvent = device.getEvent()
                     pygame.event.post(newEvent)
 
             for event in pygame.event.get():
@@ -68,6 +71,6 @@ class Window:
 
     def cleanup(self):
         """Called when the program is closed"""
-        if not self.altInput == None:
-            self.altInput.stop()
+        for device in self.altInput:
+            device.stop()
         print("Program Terminated Successfully.")
