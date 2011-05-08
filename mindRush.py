@@ -15,8 +15,7 @@ from screens import MenuScreen
 resolution = (640,480)
 #resolution = (1440,900)
 
-window = Window(resolution,
-        windowTitle="Mind Rush")
+window = Window(resolution, windowTitle="Mind Rush")
 
 manager = Manager()
 window.registerManager(manager)
