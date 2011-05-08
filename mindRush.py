@@ -17,7 +17,6 @@ resolution = (640,480)
 #resolution = (1440,900)
 
 altInput = Biofeedback('/dev/tty.usbmodem621')
-altInput = None
 
 window = Window(resolution,
         windowTitle="Mind Rush", altInput=altInput)
