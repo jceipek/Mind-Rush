@@ -63,6 +63,7 @@ class Arduino:
                 line = ""
                 print "Reading from Arduino Failed: ",e
             if mindFlexActive and ('EEG' in line):
+                print line
                 line = line.split(':')
                 line = line[1].split(',')
                 try:
@@ -116,6 +117,7 @@ class Arduino:
                 except:
                     print "Caught Mindflex serial error!"
             elif eyeCircuitActive and ('EMG' in line):
+                print line
                 line = line.split(':')
                 line = line[1].split(',')
                 try:
@@ -132,8 +134,11 @@ class Arduino:
 
         try:
             ser.close()
+            print "Closed Arduino connection."
         except:
             print "Unable to close connection to Arduino!"
+
+        self.terminate()
 
     def deactivate(self):
         self.active.value = 0

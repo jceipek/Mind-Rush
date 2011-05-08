@@ -62,7 +62,7 @@ class Manager:
     def getEventString(self, event):
         if hasattr(event, 'identifier'):
             eventName = event.identifier
-        else
+        else:
             eventName = pygame.event.event_name(event.type)
         
         return self.eventTypeToString.get(eventName,None)
@@ -116,26 +116,23 @@ class Manager:
         """
         Handles discrete events, e.g. mouse clicks and button presses
         """
-        eventString = self.getEventString(event)
+        eventName = pygame.event.event_name(event.type)
         
         #catch events associated with only the types
-        if eventString != None:
-            
-            if eventString in self.screenInputDict:
+        if eventName in self.eventTypeToString:
+            string = self.eventTypeToString[eventName]
+            if string in self.screenInputDict:
                 self.screenInputDict[string][1]()
         
-        #extensible beyond KEYUP and KEYDOWN events to user defined events    
+        #extensible beyond KEYUP and KEYDOWN events to user defined events
         if hasattr(event,'key'):
             keyName = pygame.key.name(event.key)
-            
-            #FIXME handle userdefined "key" pressed that might be unrecognized by pygame.key.name
             
             #differentiate between key up and key down events
             if event.type == pygame.KEYDOWN:
                 keyName += '_down'
             elif event.type == pygame.KEYUP:
                 keyName += '_up'
-            
                 
             if keyName in self.eventTypeToString:
                 string = self.eventTypeToString[keyName]
@@ -161,12 +158,12 @@ class Manager:
         if eventString != None:
             if eventString in self.screenInputDict:
                 if hasattr(event,'rel'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True))                    
+                    self.screenInputDict[eventString][1](ContinuousEvent(event.rel,relative = True))                    
                 if hasattr(event,'pos'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.pos))
+                    self.screenInputDict[eventString][1](ContinuousEvent(event.pos))
                     
                 if hasattr(event,'value'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.value))
+                    self.screenInputDict[eventString][1](ContinuousEvent(event.value))
 
 
     def post(self, event):

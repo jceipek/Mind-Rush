@@ -36,4 +36,4 @@ class AltInput:
         eventDict['identifier'] = identifier
         eventDict['value'] = value
         eventDict['discrete'] = discrete
-        return pygame.event.Event(pygame.USEREVENT+1, eventDict)
+        return pygame.event.Event(pygame.USEREVENT, eventDict)

@@ -16,13 +16,15 @@ from screens import MenuScreen
 resolution = (640,480)
 #resolution = (1440,900)
 
-altInput = Biofeedback('/dev/ttyACM0')
 
 window = Window(resolution,
-        windowTitle="Mind Rush", altInput=altInput)
+        windowTitle="Mind Rush")
 
 manager = Manager()
 window.registerManager(manager)
+
+arduinoInput = Biofeedback('/dev/ttyACM0')
+window.addInputDevice(arduinoInput)
 
 userInterface = UI(manager)
 #screens must be initialized after the manager and the ui

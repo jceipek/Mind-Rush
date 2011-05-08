@@ -48,11 +48,17 @@ class Arduino:
         self.highGamma = -1
         self.eyeSignal = -1
 
-        try:
-            ser = serial.Serial(deviceID, 9600)
-            time.sleep(1)
-        except:
-            raise Exception("Unable to communicate with Arduino")
+        connected = False
+        count = 0
+        while not connected and count <= 5:
+            try:
+                ser = serial.Serial(deviceID, 9600)
+                connected = True
+            except Exception as e:
+                count += 1
+                print e
+                if count >= 5:
+                    raise Exception("Unable to communicate with Arduino")
 
         while self.active.value == 1 and (mindFlexActive or eyeCircuitActive):
             try:
@@ -80,38 +86,39 @@ class Arduino:
 
                     if self.quality != newQuality:
                         self.quality = newQuality
-                        eventPipe.send(('quality',self.quality))
+                        eventPipe.send(('Arduino_quality',self.quality))
                     if self.attention != newAttention:
                         self.attention = newAttention
-                        eventPipe.send(('attention',self.attention))
+                        eventPipe.send(('Arduino_attention',self.attention))
                     if self.meditation != newMeditation:
                         self.meditation = newMeditation
-                        eventPipe.send(('meditation',self.meditation))
+                        eventPipe.send(('Arduino_meditation',self.meditation))
                     if self.delta != newDelta:
                         self.delta = newDelta
-                        eventPipe.send(('delta',self.delta))
+                        eventPipe.send(('Arduino_delta',self.delta))
                     if self.theta != newTheta:
                         self.theta = newTheta
-                        eventPipe.send(('theta',self.theta))
+                        eventPipe.send(('Arduino_theta',self.theta))
                     if self.lowAlpha != newLowAlpha:
                         self.lowAlpha = newLowAlpha
-                        eventPipe.send(('lowAlpha',self.lowAlpha))
+                        eventPipe.send(('Arduino_lowAlpha',self.lowAlpha))
                     if self.highAlpha != newHighAlpha:
                         self.highAlpha = newHighAlpha
-                        eventPipe.send(('highAlpha',self.highAlpha))
+                        eventPipe.send(('Arduino_highAlpha',self.highAlpha))
                     if self.lowBeta != newLowBeta:
                         self.lowBeta = newLowBeta
-                        eventPipe.send(('lowBeta',self.lowBeta))
+                        eventPipe.send(('Arduino_lowBeta',self.lowBeta))
                     if self.highBeta != newHighBeta:
                         self.highBeta = newHighBeta
-                        eventPipe.send(('highBeta',self.highBeta))
+                        eventPipe.send(('Arduino_highBeta',self.highBeta))
                     if self.lowGamma != newLowGamma:
                         self.lowGamma = newLowGamma
-                        eventPipe.send(('lowGamma',self.lowGamma))
+                        eventPipe.send(('Arduino_lowGamma',self.lowGamma))
                     if self.highGamma != newHighGamma:
                         self.highGamma = newHighGamma
-                        eventPipe.send(('highGamma',self.highGamma))
+                        eventPipe.send(('Arduino_highGamma',self.highGamma))
                 except:
+                    print line
                     print "Caught Mindflex serial error!"
             elif eyeCircuitActive and ('EMG:' in line):
                 line = line.split(':')
@@ -123,10 +130,10 @@ class Arduino:
 
                     if self.eyeSignal != newEyeSignal:
                         self.eyeSignal = newEyeSignal
-                        eventPipe.send(('eyeValue',self.eyeSignal))
+                        eventPipe.send(('Arduino_eyeValue',self.eyeSignal))
 
                 except:
-                    print "Caught EMG circuit serial error!"
+                    print "Caught EMG circuit serial error!",line
 
 
         try:
@@ -138,6 +145,9 @@ class Arduino:
     def deactivate(self):
         print "Deactivating Arduino Process"
         self.active.value = 0
+        time.sleep(0.1)
+        self.proc.terminate()
+        print("Closed Arduino Process")
 
 class Biofeedback(AltInput):
     def __init__(self, deviceID):

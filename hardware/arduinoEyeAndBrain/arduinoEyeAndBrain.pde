@@ -12,6 +12,7 @@ Brain brain(Serial);
 
 int eyeSensorPin = A0;    // select the input pin for the EMG
 int eyeSensorValue = 0;
+int count = 0;
 
 void setup() {	
 	// Start the hardware serial.
@@ -24,8 +25,13 @@ void loop() {
 		Serial.println("EEG:"+String(brain.readCSV())); //Reads from the Mindflex EEG
 	}
 	
+        count++;
         //Read from the EMG circuit:
-        eyeSensorValue = analogRead(eyeSensorPin);
-        Serial.println("EMG:"+String(eyeSensorValue));
+        if (count > 500)
+        {
+          eyeSensorValue = analogRead(eyeSensorPin);
+          Serial.println("EMG:"+String(eyeSensorValue));
+          count = 0;
+        }
 	
 }
