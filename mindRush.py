@@ -16,7 +16,7 @@ from screens import MenuScreen
 resolution = (640,480)
 #resolution = (1440,900)
 
-altInput = Biofeedback('/dev/tty.usbmodem621')
+altInput = Biofeedback('/dev/ttyACM0')
 
 window = Window(resolution,
         windowTitle="Mind Rush", altInput=altInput)
