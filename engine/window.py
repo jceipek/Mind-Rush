@@ -45,7 +45,6 @@ class Window:
 
         while self.active:
             for event in pygame.event.get():
-                print event
                 self.manager.handle(event)
 
             self.displaySurface.fill((0,0,0)) #should go in manager

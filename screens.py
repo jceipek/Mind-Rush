@@ -18,13 +18,17 @@ class MenuScreen(Screen):
         MenuItem.textCache = Screen.textCache
         MenuItem.resolution = Screen.resolution
         
-        self.callbackDict = {}
-        self.callbackDict['fire'] = ('deviceString', self.fire)
-        self.callbackDict['joyFire'] = ('deviceString', self.joyFire)
+        self.initializeCallbackDict()
 
         self.menuItems = []
         self.addMenuItem(MenuItem('Play',(self.resolution[0]//2,int(self.resolution[1]*(1/3.0)))))
         self.addMenuItem(MenuItem('Exit',(self.resolution[0]//2,self.resolution[1]//2)))
+
+    def initializeCallbackDict(self):
+        self.callbackDict = {}
+        self.callbackDict['fire'] = ('deviceString', self.fire)
+        self.callbackDict['joyFire'] = ('deviceString', self.joyFire)
+        self.callbackDict['move'] = ('deviceString', self.move)
 
     def addMenuItem(self,item):
         self.menuItems.append(item)
@@ -39,6 +43,12 @@ class MenuScreen(Screen):
 
     def joyFire(self):
         print 'joystick Fire'
+        
+    def move(self,movement):
+        if not movement.relative:
+            print 'absolute position', movement.values
+        else:
+            print 'relative position', movement.values
 
 class MenuItem:
 
