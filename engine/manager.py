@@ -56,9 +56,20 @@ class Manager:
                 line = line.split('#')[0]
                 if len(line)>0:
                     self.eventTypeToString[line.split(':')[1]] = line.split(':')[0]
+                self.eventTypeToString['UserEvent'] = 'UserEvent'
         except:
             raise Exception('Unable to open input configuration file')
-
+            
+    def getEventString(self, event):
+        if hasattr(event, 'identifier'):
+            eventName = event.identifier
+        else:
+            eventName = pygame.event.event_name(event.type)
+        
+        return self.eventTypeToString.get(eventName,None)
+            
+            
+                        
     def initializeCaches(self):
         Manager.textCache = TextCache()
         Manager.imageCache = ImageCache()
@@ -115,7 +126,7 @@ class Manager:
             string = self.eventTypeToString[eventName]
             if string in self.screenInputDict:
                 self.screenInputDict[string][1]()
-
+        
         #extensible beyond KEYUP and KEYDOWN events to user defined events
         if hasattr(event,'key'):
             keyName = pygame.key.name(event.key)
@@ -145,20 +156,17 @@ class Manager:
         """
         Handles absolute motion events, e.g. MOUSEMOTION
         """
-        eventName = pygame.event.event_name(event.type)
-
-        if eventName in self.eventTypeToString:
-            string = self.eventTypeToString[eventName]
-            if string in self.screenInputDict:
-                if not hasattr(event,'identifier'):
-                    event.identifier = None
+        eventString = self.getEventString(event)
+        
+        if eventString != None:
+            if eventString in self.screenInputDict:
                 if hasattr(event,'rel'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True, identifier = identifier))
+                    self.screenInputDict[eventString][1](ContinuousEvent(event.rel,relative = True))                    
                 if hasattr(event,'pos'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.pos, identifier = identifier))
-
+                    self.screenInputDict[eventString][1](ContinuousEvent(event.pos))
+                    
                 if hasattr(event,'value'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.value, identifier = identifier))
+                    self.screenInputDict[eventString][1](ContinuousEvent(event.value))
 
 
     def post(self, event):

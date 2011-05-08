@@ -48,11 +48,17 @@ class Arduino:
         self.highGamma = -1
         self.eyeSignal = -1
 
-        try:
-            ser = serial.Serial(deviceID, 9600)
-            time.sleep(1)
-        except:
-            raise Exception("Unable to communicate with Arduino")
+        connected = False
+        count = 0
+        while not connected and count <= 5:
+            try:
+                ser = serial.Serial(deviceID, 9600)
+                connected = True
+            except Exception as e:
+                count += 1
+                print e
+                if count >= 5:
+                    raise Exception("Unable to communicate with Arduino")
 
         while self.active.value == 1 and (mindFlexActive or eyeCircuitActive):
             try:
@@ -127,8 +133,7 @@ class Arduino:
                         eventPipe.send(('Arduino_eyeValue',self.eyeSignal))
 
                 except:
-                    print line
-                    print "Caught EMG circuit serial error!"
+                    print "Caught EMG circuit serial error!",line
 
 
         try:

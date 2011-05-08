@@ -10,10 +10,9 @@ class ContinuousEvent:
     """
     Used to contain the data of continuous events
     """
-    def __init__(self, values, relative = False, identifier = None):
+    def __init__(self, values, relative = False):
 
         self.relative = relative
-        self.identifier = identifier
         #handle multiple "values" types
         if isinstance(values, list) or isinstance(values, tuple):
             self.values = list(values)
