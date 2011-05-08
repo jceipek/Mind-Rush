@@ -41,7 +41,12 @@ class MenuScreen(Screen):
                 if item.text == 'Exit':
                     pygame.event.post(pygame.event.Event(pygame.QUIT,{}))
                 elif item.text == 'Play':
-                    print item.text
+                    self.play()
+                    
+    def play(self):
+        gameScreen = GameScreen(self.resolution, self._ui)
+        self._ui.clearActiveScreens()
+        self._ui.addActiveScreens(gameScreen)
 
 class MenuItem:
 
@@ -72,6 +77,17 @@ class GameScreen(Screen):
     def __init__(self, size, ui):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
+        
+        fontname = pathJoin(('fonts','orbitron',
+            'orbitron-black.ttf'))
+        size = int(self.resolution[1]*(1/15.0))
+        color = (255,255,255)
+        antialias = True
+        self.textSurface = self.textCache.getText('this is the game\nenjoy your stay...', fontname, size, color, antialias=antialias)
+        
+    def draw(self, surf):
+        Screen.draw(self, surf)
+        surf.blit(self.textSurface,(0,0))
 
 
 class ScoreScreen(Screen):
@@ -89,6 +105,3 @@ class LoadingScreen(Screen):
 
     def __init__(self):
         pass
-
-if __name__ == '__main__':
-    MenuItem('text')
