@@ -54,11 +54,13 @@ class UI:
         for screen in self.activeScreens:
             screen.update(*args)
 
-    def setCaches(textCache=None):
+    def setCaches(textCache=None, imageCache=None):
         """
         Called by the manager to let the ui make images, text, etc.
         """
         if textCache != None:
             UI.textCache = textCache
+        if imageCache != None:
+            UI.imageCache = imageCache
 
     setCaches = ClassMethod(setCaches)

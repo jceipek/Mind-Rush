@@ -16,6 +16,8 @@ class Screen(pygame.Surface):
         pygame.Surface.__init__(self, size)
         if not hasattr(self,'textCache'):
             Screen.setCaches(textCache=ui.textCache)
+        if not hasattr(self,'imageCache'):
+            Screen.setCaches(imageCache=ui.imageCache)
         if not hasattr(self,'resolution'):
             Screen.resolution = ui.resolution
         self.background = background
@@ -23,7 +25,7 @@ class Screen(pygame.Surface):
         self.shouldUpdate = True
         self.initializeCallbackDict()
         self._ui = ui
-        
+
     def initializeCallbackDict(self):
         self.callbackDict = {}
 
@@ -34,16 +36,18 @@ class Screen(pygame.Surface):
         """
         self.background.draw(surf)
 
-    def setCaches(textCache=None):
+    def setCaches(textCache=None, imageCache=None):
         """
         Called in the init method to let screens make images, text, etc.
         """
         if textCache != None:
             Screen.textCache = textCache
+        if imageCache != None:
+            Screen.imageCache = imageCache
 
     def update(self, *args):
         pass
-        
+
     def getCallbackDict(self):
         """
         Used to pass callbacks to the manager.

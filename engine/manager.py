@@ -9,6 +9,7 @@
 import pygame
 
 from textCache import TextCache
+from imageCache import ImageCache
 from continuousEvent import ContinuousEvent
 
 class Manager:
@@ -16,16 +17,16 @@ class Manager:
     def __init__(self):
         self.inputDict = {}
         self.screenInputDict = {}
-        
+
         self.readEventConfig()
         self.initializeCaches()
-        
+
         #register continuous events
         self.registerEventWithCallback(pygame.MOUSEMOTION, self.handleContinuous)
         self.registerEventWithCallback(pygame.JOYBALLMOTION, self.handleContinuous)
         self.registerEventWithCallback(pygame.JOYAXISMOTION, self.handleContinuous)
         self.registerEventWithCallback(pygame.JOYHATMOTION, self.handleContinuous)
-        
+
         #register discrete events
         self.registerEventWithCallback(pygame.MOUSEBUTTONUP, self.handleDiscrete)
         self.registerEventWithCallback(pygame.MOUSEBUTTONDOWN, self.handleDiscrete)
@@ -39,32 +40,34 @@ class Manager:
         This reads from the config file and construct the
         eventTypeToString dictionary
         """
-        
+
         self.eventTypeToString = {}
-        
+
         try:
             inputFile = open("input.config")
-                
+
             for line in inputFile:
                 #Strip extra whitespace
                 line = line.strip()
                 line = line.replace(" ","")
                 line = line.replace("\t","")
-                
+
                 #ignore comments
                 line = line.split('#')[0]
                 if len(line)>0:
-                    self.eventTypeToString[line.split(':')[1]] = line.split(':')[0]    
+                    self.eventTypeToString[line.split(':')[1]] = line.split(':')[0]
         except:
             raise Exception('Unable to open input configuration file')
-                        
+
     def initializeCaches(self):
         Manager.textCache = TextCache()
+        Manager.imageCache = ImageCache()
 
     def registerUI(self, ui):
         self._ui = ui
-        self._ui.setCaches(textCache=self.textCache)
-        
+        self._ui.setCaches(textCache=self.textCache,
+                           imageCache=self.imageCache)
+
     def setScreenInputDict(self, dict):
         """
         Associates event types to devices and callbacks
@@ -100,34 +103,34 @@ class Manager:
                 self.handleDiscrete(event)
             else:
                 self.handleContinuous(event)
-            
+
     def handleDiscrete(self, event):
         """
         Handles discrete events, e.g. mouse clicks and button presses
         """
         eventName = pygame.event.event_name(event.type)
-        
+
         #catch events associated with only the types
         if eventName in self.eventTypeToString:
             string = self.eventTypeToString[eventName]
             if string in self.screenInputDict:
                 self.screenInputDict[string][1]()
-        
-        #extensible beyond KEYUP and KEYDOWN events to user defined events    
+
+        #extensible beyond KEYUP and KEYDOWN events to user defined events
         if hasattr(event,'key'):
             keyName = pygame.key.name(event.key)
-            
+
             #differentiate between key up and key down events
             if event.type == pygame.KEYDOWN:
                 keyName += '_down'
             elif event.type == pygame.KEYUP:
                 keyName += '_up'
-                
+
             if keyName in self.eventTypeToString:
                 string = self.eventTypeToString[keyName]
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1]()
-                
+
         #extensible beyond MOUSEBUTTONUP, MOUSEBUTTONDOWN, JOYBUTTONUP and
         #JOYBUTTONDOWN to user defined events
         if hasattr(event,'button'):
@@ -136,24 +139,24 @@ class Manager:
                 string = self.eventTypeToString[buttonName]
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1]()
-            
-        
+
+
     def handleContinuous(self, event):
         """
         Handles absolute motion events, e.g. MOUSEMOTION
         """
         eventName = pygame.event.event_name(event.type)
-        
+
         if eventName in self.eventTypeToString:
             string = self.eventTypeToString[eventName]
             if string in self.screenInputDict:
                 if not hasattr(event,'identifier'):
                     event.identifier = None
                 if hasattr(event,'rel'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True, identifier = identifier))                    
+                    self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True, identifier = identifier))
                 if hasattr(event,'pos'):
                     self.screenInputDict[string][1](ContinuousEvent(event.pos, identifier = identifier))
-                    
+
                 if hasattr(event,'value'):
                     self.screenInputDict[string][1](ContinuousEvent(event.value, identifier = identifier))
 

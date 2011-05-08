@@ -17,6 +17,7 @@ class MenuScreen(Screen):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
         MenuItem.textCache = Screen.textCache
+        MenuItem.imageCache = Screen.imageCache
         MenuItem.resolution = Screen.resolution
 
         self.menuItems = []
@@ -34,7 +35,7 @@ class MenuScreen(Screen):
         Screen.draw(self, surf)
         for menuItem in self.menuItems:
             menuItem.draw(surf)
-            
+
     def leftClick(self):
         for item in self.menuItems:
             if item.rect.collidepoint(pygame.mouse.get_pos()):
@@ -42,7 +43,7 @@ class MenuScreen(Screen):
                     pygame.event.post(pygame.event.Event(pygame.QUIT,{}))
                 elif item.text == 'Play':
                     self.play()
-                    
+
     def play(self):
         gameScreen = GameScreen(self.resolution, self._ui)
         self._ui.clearActiveScreens()
@@ -77,14 +78,14 @@ class GameScreen(Screen):
     def __init__(self, size, ui):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
-        
+
         fontname = pathJoin(('fonts','orbitron',
             'orbitron-black.ttf'))
         size = int(self.resolution[1]*(1/15.0))
         color = (255,255,255)
         antialias = True
         self.textSurface = self.textCache.getText('this is the game\nenjoy your stay...', fontname, size, color, antialias=antialias)
-        
+
     def draw(self, surf):
         Screen.draw(self, surf)
         surf.blit(self.textSurface,(0,0))

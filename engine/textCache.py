@@ -7,8 +7,6 @@
 #
 
 import pygame
-from weakref import WeakKeyDictionary
-from potentialObject import PotentialObject
 
 class TextCache:
     """
@@ -18,8 +16,8 @@ class TextCache:
     or text has to be rendered to a surface.
     """
     def __init__(self):
-        self.fonts = {}#WeakKeyDictionary()
-        self.text = {}#WeakKeyDictionary()
+        self.fonts = {}
+        self.text = {}
 
     def getText(self, text, fontname, size,
                 color, antialias=False, bgColor=None):
