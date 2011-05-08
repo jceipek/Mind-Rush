@@ -24,18 +24,19 @@ class TrueProcess(multiprocessing.Process):
         multiprocessing.Process.__init__(self, target=target, args=args)
         self.start()
 
-class MindflexDevice:
+class Arduino:
     def __init__(self):
         self.active = multiprocessing.Value('i',1)
         self.eventReader = None
         self.proc = None
 
-    def listen(self):
+    def listen(self, deviceID, mindFlexActive=True, eyeCircuitActive=True):
         eventReader,eventPipe = multiprocessing.Pipe()
-        self.proc = TrueProcess(self.mindflexReader, eventPipe)
+        self.proc = TrueProcess(self.mindflexReader, deviceID, eventPipe)
         return eventReader
 
-    def mindflexReader(self, eventPipe):
+    def mindflexReader(self, deviceID, eventPipe,
+                        mindFlexActive=True, eyeCircuitActive=True):
         self.quality = -1
         self.attention = -1
         self.meditation = -1
@@ -47,27 +48,29 @@ class MindflexDevice:
         self.highBeta = -1
         self.lowGamma = -1
         self.highGamma = -1
+        self.eyeSignal = -1
 
         try:
-            ser = serial.Serial('/dev/tty.usbmodem411', 9600)
+            ser = serial.Serial(deviceID, 9600)
             time.sleep(1)
         except:
             raise Exception("Unable to communicate with Arduino")
 
-        while self.active:
+        while self.active and (mindFlexActive or eyeCircuitActive):
             try:
                 line = ser.readline().strip()
             except Exception as e:
                 line = ""
                 print "Reading from Arduino Failed: ",e
-            if not line == "":
-                line = line.split(',')
+            if mindFlexActive and ('EEG' in line):
+                line = line.split(':')
+                line = line[1].split(',')
                 try:
                     if not len(line) == 11:
                         raise ValuError
                     newQuality = (200.0-int(line[0]))/200.0
-                    newAttention = (200.0-int(line[1]))/200.0
-                    newMeditation = (200.0-int(line[2]))/200.0
+                    newAttention = int(line[1])/100.0
+                    newMeditation = int(line[2])/100.0
                     newDelta = int(line[3])
                     newTheta = int(line[4])
                     newLowAlpha = int(line[5])
@@ -112,17 +115,33 @@ class MindflexDevice:
                         eventPipe.send(('highGamma',self.highGamma))
                 except:
                     print "Caught Mindflex serial error!"
+            elif eyeCircuitActive and ('EMG' in line):
+                line = line.split(':')
+                line = line[1].split(',')
+                try:
+                    if not len(line) == 1:
+                        raise ValuError
+                    newEyeSignal = int(line[0])
 
-        ser.close()
+                    if self.eyeSignal != newEyeSignal:
+                        self.eyeSignal = newEyeSignal
+                        eventPipe.send(('eyeValue',self.eyeSignal))
+
+                except:
+                    print "Caught EMG circuit serial error!"
+
+        try:
+            ser.close()
+        except:
+            print "Unable to close connection to Arduino!"
 
     def deactivate(self):
         self.active.value = 0
 
+
 if __name__ == "__main__":
-    m = MindflexDevice()
-    a = m.listen()
+    m = Arduino()
+    a = m.listen('/dev/tty.usbmodem621')
     while 1:
         if a.poll():
-            print "MOO: ",a.recv()
-    #ser = serial.Serial('/dev/tty.usbmodem621', 9600)
-    print "HI"
+            print "Event: ",a.recv()
