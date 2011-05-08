@@ -158,5 +158,6 @@ class Manager:
                 if string in self.screenInputDict:
                     self.screenInputDict[string][1](ContinuousEvent(event.value))
 
+
     def post(self, event):
         pygame.event.post(Event)
