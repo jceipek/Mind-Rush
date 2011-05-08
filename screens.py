@@ -116,12 +116,7 @@ class GameScreen(Screen):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
         
-        fontname = pathJoin(('fonts','orbitron',
-            'orbitron-black.ttf'))
-        size = int(self.resolution[1]*(1/15.0))
-        color = (255,255,255)
-        antialias = True
-        self.textSurface = self.textCache.getText('this is the game\nenjoy your stay...', fontname, size, color, antialias=antialias)
+        
         
     def initializeCallbackDict(self):
         self.callbackDict = {}
@@ -130,11 +125,13 @@ class GameScreen(Screen):
     def steer(self, event):
         #move the spaceship in this method
         
-        position = event.values[0]#the position of the event
+        self.targetPosition = event.values[0]#the position of the event
         
     def draw(self, surf):
         Screen.draw(self, surf)
         surf.blit(self.textSurface,(0,0))
+        
+    def update(self, *args)
 
 class OptionsScreen(Screen):
 
