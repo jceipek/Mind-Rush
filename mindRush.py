@@ -10,13 +10,16 @@ from engine.ui import UI
 from engine.manager import Manager
 from engine.window import Window
 
+from biofeedback import Biofeedback
 from screens import MenuScreen
 
 resolution = (640,480)
 #resolution = (1440,900)
 
+altInput = Biofeedback('/dev/tty.usbmodem621')
+
 window = Window(resolution,
-        windowTitle="Mind Rush")
+        windowTitle="Mind Rush", altInput=altInput)
 
 manager = Manager()
 window.registerManager(manager)

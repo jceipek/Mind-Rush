@@ -1,5 +1,5 @@
 #
-# input.py
+# biofeedback.py
 #
 # Copyright (C)2011 Julian Ceipek and Patrick Varin
 #
@@ -19,10 +19,8 @@ except:
 
 import time
 
-class TrueProcess(multiprocessing.Process):
-    def __init__(self, target, *args):
-        multiprocessing.Process.__init__(self, target=target, args=args)
-        self.start()
+from engine.trueProcess import TrueProcess
+from engine.altInput import AltInput
 
 class Arduino:
     def __init__(self):
@@ -138,10 +136,20 @@ class Arduino:
     def deactivate(self):
         self.active.value = 0
 
+class Biofeedback(AltInput):
+    def __init__(self, deviceID):
+        self.arduino = Arduino()
+        self.listener = arduino.listen(deviceID)
 
-if __name__ == "__main__":
-    m = Arduino()
-    a = m.listen('/dev/tty.usbmodem621')
-    while 1:
-        if a.poll():
-            print "Event: ",a.recv()
+    def poll(self):
+        return self.listener.poll()
+
+    def getEvent(self):
+        reading = self.arduino.recv()
+        identifier = reading[0]
+        value = reading[1]
+        discrete = False #All of the bio-feedback events we use are continuous values
+        self.makeEvent(identifier, value, discrete)
+
+    def stop(self):
+        self.arduino.deactivate()
