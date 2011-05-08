@@ -54,18 +54,18 @@ class Arduino:
         except:
             raise Exception("Unable to communicate with Arduino")
 
-        while self.active and (mindFlexActive or eyeCircuitActive):
+        while self.active.value == 1 and (mindFlexActive or eyeCircuitActive):
             try:
                 line = ser.readline().strip()
             except Exception as e:
                 line = ""
                 print "Reading from Arduino Failed: ",e
-            if mindFlexActive and ('EEG' in line):
+            if mindFlexActive and ('EEG:' in line):
                 line = line.split(':')
                 line = line[1].split(',')
                 try:
                     if not len(line) == 11:
-                        raise ValuError
+                        raise ValueError
                     newQuality = (200.0-int(line[0]))/200.0
                     newAttention = int(line[1])/100.0
                     newMeditation = int(line[2])/100.0
@@ -113,12 +113,12 @@ class Arduino:
                         eventPipe.send(('highGamma',self.highGamma))
                 except:
                     print "Caught Mindflex serial error!"
-            elif eyeCircuitActive and ('EMG' in line):
+            elif eyeCircuitActive and ('EMG:' in line):
                 line = line.split(':')
                 line = line[1].split(',')
                 try:
                     if not len(line) == 1:
-                        raise ValuError
+                        raise ValueError
                     newEyeSignal = int(line[0])
 
                     if self.eyeSignal != newEyeSignal:
@@ -128,28 +128,31 @@ class Arduino:
                 except:
                     print "Caught EMG circuit serial error!"
 
+
         try:
             ser.close()
+            print "Arduino Connection Closed"
         except:
             print "Unable to close connection to Arduino!"
 
     def deactivate(self):
+        print "Deactivating Arduino Process"
         self.active.value = 0
 
 class Biofeedback(AltInput):
     def __init__(self, deviceID):
         self.arduino = Arduino()
-        self.listener = arduino.listen(deviceID)
+        self.listener = self.arduino.listen(deviceID)
 
     def poll(self):
         return self.listener.poll()
 
     def getEvent(self):
-        reading = self.arduino.recv()
+        reading = self.listener.recv()
         identifier = reading[0]
         value = reading[1]
         discrete = False #All of the bio-feedback events we use are continuous values
-        self.makeEvent(identifier, value, discrete)
+        return self.makeEvent(identifier, value, discrete)
 
     def stop(self):
         self.arduino.deactivate()
