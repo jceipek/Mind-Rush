@@ -22,6 +22,7 @@ class Screen(pygame.Surface):
         self.size = size #Should default to screen size if not specified
         self.shouldUpdate = True
         self.initializeCallbackDict()
+        self._ui = ui
         
     def initializeCallbackDict(self):
         self.callbackDict = {}

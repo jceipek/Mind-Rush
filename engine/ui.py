@@ -27,7 +27,7 @@ class UI:
         self.activeScreens.append(*screens)
         self._manager.setScreenInputDict(self.activeScreens[-1].getCallbackDict())
 
-    def clearActiveScreens(self, screens):
+    def clearActiveScreens(self):
         """
         Removes all of the screens from view
         """

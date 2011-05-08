@@ -95,6 +95,11 @@ class Manager:
         """
         if event.type in self.inputDict:
             self.inputDict[event.type](event)
+        elif event.type == pygame.USEREVENT:
+            if event.discrete:
+                self.handleDiscrete(event)
+            else:
+                self.handleContinuous(event)
             
     def handleDiscrete(self, event):
         """
@@ -142,13 +147,15 @@ class Manager:
         if eventName in self.eventTypeToString:
             string = self.eventTypeToString[eventName]
             if string in self.screenInputDict:
+                if not hasattr(event,'identifier'):
+                    event.identifier = None
                 if hasattr(event,'rel'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True))                    
+                    self.screenInputDict[string][1](ContinuousEvent(event.rel,relative = True, identifier = identifier))                    
                 if hasattr(event,'pos'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.pos))
+                    self.screenInputDict[string][1](ContinuousEvent(event.pos, identifier = identifier))
                     
                 if hasattr(event,'value'):
-                    self.screenInputDict[string][1](ContinuousEvent(event.value))
+                    self.screenInputDict[string][1](ContinuousEvent(event.value, identifier = identifier))
 
     def post(self, event):
         pygame.event.post(Event)
