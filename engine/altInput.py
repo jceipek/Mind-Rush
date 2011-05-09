@@ -21,8 +21,8 @@ class AltInput:
         #Use this to check if there is an event available
         return False #OVERRIDE
 
-    def getEvent(self):
-        #get the next event, or wait until one is available
+    def getEvents(self):
+        #get the next event(s), or wait until one is available
         pass #OVERRIDE, using makeEvent
 
     def stop(self):

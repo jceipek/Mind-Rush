@@ -50,8 +50,8 @@ class Window:
         while self.active:
             for device in self.altInput:
                 if device.poll():
-                    newEvent = device.getEvent()
-                    pygame.event.post(newEvent)
+                    for newEvent in device.getEvents():
+                        pygame.event.post(newEvent)
 
             for event in pygame.event.get():
                 self.manager.handle(event)
