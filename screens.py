@@ -8,10 +8,16 @@
 
 import pygame
 import random
+import math
 
 from engine.screen import Screen
 from engine.functions import pathJoin
 from engine.background import Background
+
+#For GameScreen:
+from gameObjects.ship import Ship, TestShip
+from gameObjects.boulder import Boulder
+from gameObjects.boulderFragment import BoulderFragment
 
 class MenuScreen(Screen):
 
@@ -118,7 +124,7 @@ class GameScreen(Screen):
     def __init__(self, size, ui):
         Ship.imageCache = Screen.imageCache
         Boulder.imageCache = Screen.imageCache
-        Fragment.imageCache = Screen.imageCache
+        BoulderFragment.imageCache = Screen.imageCache
 
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
@@ -131,7 +137,7 @@ class GameScreen(Screen):
         self.boulders = pygame.sprite.Group()
         self.nextBoulderTime = 0
 
-        self.fragments = pygame.sprite.Group()
+        self.boulderFragments = pygame.sprite.Group()
 
 
     def initializeCallbackDict(self):
@@ -143,184 +149,35 @@ class GameScreen(Screen):
         self.ship.targetPosition = (event.values[0], self.ship.targetPosition[1])
         pass#self.targetPosition = event.values[0]#the position of the event
 
-    def addFragment(self, pos=(0,0), vel=(0,0)):
-        newFragment = Fragment(self,
+    def addBoulderFragment(self, pos=(0,0), vel=(0,0)):
+        newBoulderFragment = BoulderFragment(self,
                                pos=pos,
                                vel=vel,
                                screenBoundaries=(0,0)+self.resolution)
-        self.fragments.add(newFragment)
+        self.boulderFragments.add(newBoulderFragment)
 
     def draw(self, surf):
         Screen.draw(self, surf)
         self.ship.draw(surf)
         self.boulders.draw(surf)
-        self.fragments.draw(surf)
+        self.boulderFragments.draw(surf)
 
     def update(self, *args):
         gameTime, frameTime = args[:2]
         self.ship.update(*args)
         self.boulders.update(*args)
-        self.fragments.update(*args)
+        self.boulderFragments.update(*args)
+
+        #For every boulder colliding with the ship,
+        #kill the boulder & lose health
+        for boulder in self.ship.testMaskCollision(self.boulders):
+            boulder.kill()
 
         if gameTime >= self.nextBoulderTime:
             boulderPos = random.randint(0,self.resolution[0]), 0
             self.boulders.add(Boulder(self, pos=boulderPos, screenBoundaries=(0,0)+self.resolution))
             self.nextBoulderTime = gameTime + random.randint(10,1000)
 
-class GameObject(pygame.sprite.Sprite):
-
-    def __init__(self, image, parent, pos=(0,0), vel=(0,0)):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = image
-        self.rect = image.get_rect()
-        self.rect.center = int(pos[0]), int(pos[1])
-        self.position = pos
-        self.velocity = vel
-        self.parent = parent
-        self.acceleration = (0,0)
-
-    def move(self, delta):
-        self.position = self.position[0]+delta[0], self.position[1]+delta[1]
-        self.rect.center = int(self.position[0]), int(self.position[1])
-
-    def moveTo(self, pos):
-        self.position = pos
-        self.rect.center = int(pos[0]), int(pos[1])
-
-    def draw(self, surf):
-        surf.blit(self.image, self.rect)
-
-    def update(self, *args):
-        gameTime, frameTime = args[:2]
-        self.velocity = (frameTime*self.acceleration[0]+self.velocity[0],
-                        frameTime*self.acceleration[1]+self.velocity[1])
-        self.position = (frameTime*self.velocity[0]+self.position[0],
-                        frameTime*self.velocity[1]+self.position[1])
-        self.moveTo(self.position)
-
-class Ship(GameObject):
-
-    def __init__(self, parent, pos=(0,0), vel=(0,0), screenBoundaries=None):
-
-        shipPath = pathJoin(('images','ship.png'))
-        shipImage = self.imageCache.getImage(shipPath, colorkey='alpha', mask=True)
-
-        GameObject.__init__(self, shipImage, parent, pos, vel)
-        self.targetPosition = pos
-
-        self.screenBoundaries = screenBoundaries
-        if screenBoundaries != None:
-            self.minXPos = screenBoundaries[0] + self.rect.width/2
-            self.maxXPos = screenBoundaries[2] - self.rect.width/2
-
-    def update(self, *args):
-        gameTime, frameTime = args[:2]
-        speed = .006
-        error = self.targetPosition[0]-self.position[0], self.targetPosition[1]-self.position[1]
-        self.velocity = error[0]*speed, error[1]*speed
-
-        #don't allow the ship to jump over the target position (applicable only at high speeds)
-        nextPos = [frameTime*self.velocity[0]+self.position[0],
-                        frameTime*self.velocity[1]+self.position[1]]
-        nextError = self.targetPosition[0]-nextPos[0], self.targetPosition[1]-nextPos[1]
-        if error[0]*nextError[0] < 0:
-            nextPos[0] = self.targetPosition[0]
-        if error[1]*nextError[1] < 0:
-            nextPos[1] = self.targetPosition[1]
-        self.position = nextPos
-
-        #don't allow the ship off of the sides of the screen
-        if self.screenBoundaries != None:
-            if self.position[0] > self.maxXPos:
-                self.position = self.maxXPos, self.position[1]
-            elif self.position[0] < self.minXPos:
-                self.position = self.minXPos, self.position[1]
-        self.moveTo(self.position)
-        
-class TestShip(Ship):
-    def __init__(*args, **kwargs):
-        Ship.__init__(*args,**kwargs)
-        self.stage = 0
-        self.finished = False
-    def update(self, *args):
-        GameObject.update(self, *args)
-        if self.stage == 0 and self.position[0] < self.minXPos:
-            self.velocity = (-self.velocity[0], self.velocity[1])
-            self.stage = 1
-        elif self.stage == 1 and self.position[0] > self.maxXPos:
-            self.stage = 2
-            self.velocity = (-self.velocity[0], self.velocity[1])
-        elif self.stage == 2 and self.position[0] < (self.minXPos + self.maxXPos)/2:
-            self.stage = 3
-
-
-class Boulder(GameObject):
-
-    def __init__(self, parent, pos=(0,0), vel=(0,0), screenBoundaries = None):
-        boulderPath = pathJoin(('images','boulder.png'))
-        boulderImage = self.imageCache.getImage(boulderPath, colorkey='alpha', mask=True)
-
-        GameObject.__init__(self, boulderImage, parent, pos, vel)
-
-        if screenBoundaries == None:
-            raise Exception('Boulders must have screen boundaries')
-        self.boundaries = screenBoundaries
-        self.acceleration = (0,.001)
-
-
-    def kill(self):
-        GameObject.kill(self)
-        #from random import randint
-        from math import sin,cos
-        for i in xrange(8):
-            self.parent.addFragment(pos=self.position,
-            vel=(cos((2*3.14159)/8.0*i),sin((2*3.14159)/8.0*i)))
-
-    def update(self, *args):
-        GameObject.update(self, *args)
-
-        #bounce off of the walls
-
-        if self.rect.topleft[0] < self.boundaries[0] or \
-            self.rect.topleft[0] + self.rect.width > self.boundaries[2]:
-
-            self.velocity = -self.velocity[0], self.velocity[1]
-
-        #hit the ground
-        if self.rect.topleft[1] + self.rect.height > self.boundaries[3]:
-
-            self.kill()
-
-class Fragment(GameObject):
-    def __init__(self, parent, pos=(0,0), vel=(0,0), screenBoundaries = None):
-        fragmentPath = pathJoin(('images','fragment.png'))
-        fragmentImage = self.imageCache.getImage(fragmentPath, colorkey='alpha', mask=True)
-
-        rect = self.imageCache.getRect(fragmentPath)
-
-        GameObject.__init__(self, fragmentImage, parent, pos, vel)
-
-        if screenBoundaries == None:
-            raise Exception('Boulders must have screen boundaries')
-        self.boundaries = (screenBoundaries[0]-rect.width,
-                           screenBoundaries[1]-rect.height,
-                           screenBoundaries[2]+rect.width,
-                           screenBoundaries[3]+rect.height)
-
-        self.acceleration = (0,0.001)
-
-
-    def kill(self):
-        GameObject.kill(self)
-
-    def update(self, *args):
-        GameObject.update(self, *args)
-
-        #kill when off-screen:
-        if ((self.rect.topleft[0] < self.boundaries[0]) or
-           (self.rect.topleft[0] + self.rect.width > self.boundaries[2]) or
-           (self.rect.topleft[1] + self.rect.height > self.boundaries[3])):
-            self.kill()
 
 class OptionsScreen(Screen):
 
@@ -392,13 +249,24 @@ class CalibrationScreen(Screen):
         self.menuItems = []
         self.addMenuItem(MenuItem('You are about to calibrate your eye circuit',(self.resolution[0]//2,int(self.resolution[1]*.1)),scaleSize=.75))
         self.addMenuItem(MenuItem('Follow the ship with your eyes',(self.resolution[0]//2,int(self.resolution[1]*.17)),scaleSize=.75))
-        self.addMenuItem(MenuItem('Press the spacebar to continue',(self.resolution[0]//2,int(self.resolution[1]*.24)),scaleSize=.75))
+        self.addMenuItem(MenuItem('Start',(self.resolution[0]//2,int(self.resolution[1]*.31)),scaleSize=.75))
+        
+        self.shipPositions = []
+        self.eyePositions = []
         
         self.running = False
 
+    def gatherData(self, event):
+        if self.running:
+            self.shipPositions.append(self.ship.position[0])
+            self.eyePositions.append(event.values[0])
+            print 'gathering data'
+    
     def initializeCallbackDict(self):
         self.callbackDict = {}
         self.callbackDict['startCalibration'] = ('deviceString', self.start)
+        self.callbackDict['left_click'] = ('deviceString', self.leftClick)
+        self.callbackDict['look'] = ('deviceString', self.gatherData)
 
     def addMenuItem(self,item):
         self.menuItems.append(item)
@@ -411,11 +279,52 @@ class CalibrationScreen(Screen):
         
     def update(self, *args):
         self.ship.update(*args)
-        pass
+        if self.ship.finished:
+            self.finish()
+            
+    def leftClick(self):
+        for item in self.menuItems:
+            if item.rect.collidepoint(pygame.mouse.get_pos()):
+                if item.text == 'Retry' or item.text == 'Start':
+                    self.start()
+                elif item.text == 'Continue':
+                    self.close()
+
+    def close(self):
+        if len(self.eyePositions):
+            eyeAve = math.fsum(self.eyePositions)/len(self.eyePositions)
+            shipAve = math.fsum(self.shipPositions)/len(self.shipPositions)
+            slopeTot = 0
+            for eyeP, shipP in zip(self.eyePositions, self.shipPositions):
+                slopeTot += (eyeP-eyeAve)/(shipP-shipAve)
+            slopeAve = slopeTot/len(self.eyePositions)
+            
+            def getShipPosition(eyePosition):
+                shipPosition = slopeAve * (eyePosition - eyeAve) + shipAve
+            
+            self._ui.getShipPosition = getShipPosition
+            print 's = %f*(e-%f)+%f' % (slopeAve, eyeAve, shipAve)
+        
+        else:
+            print 'Calibration failed'
+        #create the calibration function here
+        self._ui.clearTopScreen()
+    
+    def finish(self):
+        self.running = False
+        
+        self.menuItems = []
+        self.addMenuItem(MenuItem('You have calibrated your eye circuit',(self.resolution[0]//2,int(self.resolution[1]*.1)),scaleSize=.75))
+        self.addMenuItem(MenuItem('Continue',(int(self.resolution[0]*.3),int(self.resolution[1]*.31)),scaleSize=.75))
+        self.addMenuItem(MenuItem('Retry',(int(self.resolution[0]*.7),int(self.resolution[1]*.31)),scaleSize=.75))
 
     def start(self):
+        self.eyePositions = []
+        self.shipPositions = []
+        self.menuItems = []
         if not self.running:
-            self.ship.velocity = (.01,0)
+            self.ship.stage = 0
+            self.ship.velocity = (-1,0)
             self.running = True
             
 
@@ -423,7 +332,6 @@ class ScoreScreen(Screen):
 
     def __init__(self):
         pass
-
 
 class NotificationScreen(Screen):
 

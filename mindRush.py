@@ -13,8 +13,8 @@ from engine.window import Window
 from biofeedback import Biofeedback
 from screens import MenuScreen
 
-#resolution = (640,480)
-resolution = (1440,900)
+resolution = (640,480)
+#resolution = (1440,900)
 
 
 window = Window(resolution,
@@ -23,8 +23,8 @@ window = Window(resolution,
 manager = Manager()
 window.registerManager(manager)
 
-arduinoInput = Biofeedback('/dev/tty.usbmodem621',
-                            mindFlexActive=False, eyeCircuitActive=False)
+arduinoInput = Biofeedback('/dev/ttyACM0',
+                            mindFlexActive=False, eyeCircuitActive=True)
 window.addInputDevice(arduinoInput)
 
 userInterface = UI(manager)
