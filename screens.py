@@ -25,7 +25,7 @@ class MenuScreen(Screen):
         self.addMenuItem(MenuItem('Play',(int(self.resolution[0]*(1/3.0)),self.resolution[1]//2,)))
         self.addMenuItem(MenuItem('Options',(int(self.resolution[0]*.5),self.resolution[1]//2)))
         self.addMenuItem(MenuItem('Exit',(int(self.resolution[0]*(2/3.0)),self.resolution[1]//2)))
-        
+
         self.organizeMenuItems()
 
     def initializeCallbackDict(self):
@@ -51,36 +51,36 @@ class MenuScreen(Screen):
                     self.play()
                 elif item.text == 'Options':
                     self.displayOptionsScreen()
-                    
+
     def organizeMenuItems(self):
         screenWidth = self.resolution[0]
         itemsLength = 0
-        
+
         for item in self.menuItems:
             itemsLength += item.rect.width
-            
+
         if itemsLength >= screenWidth:
             pass#FIXME, Handle this case
         else:
             itemSpace = (screenWidth-itemsLength)/(len(self.menuItems)+1)
-            
+
         nextPosition = itemSpace
         for i in range(len(self.menuItems)):
             self.menuItems[i].rect.topleft = (nextPosition,self.menuItems[i].rect.topleft[1])
             nextPosition += itemSpace + self.menuItems[i].rect.width
-                    
+
     def play(self):
         gameScreen = GameScreen(self.resolution, self._ui)
         self._ui.clearActiveScreens()
         self._ui.addActiveScreens(gameScreen)
-        
+
     def displayOptionsScreen(self):
         optionsScreen = OptionsScreen(self.resolution, self._ui)
         self._ui.addActiveScreens(optionsScreen)
-        
+
     def printLook(self, event):
         print event.values
-        
+
     def printConnectionQuality(self, event):
         print event.values
 
@@ -115,25 +115,31 @@ class GameScreen(Screen):
     def __init__(self, size, ui):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
-        
-        
-        
+
+
+
     def initializeCallbackDict(self):
         self.callbackDict = {}
         self.callbackDict['look'] = ('deviceString', self.steer)
-        
+
     def steer(self, event):
         #move the spaceship in this method
-        
+
         self.targetPosition = event.values[0]#the position of the event
-        
+
     def draw(self, surf):
         Screen.draw(self, surf)
         surf.blit(self.textSurface,(0,0))
+<<<<<<< HEAD
         
     def update(self, *args):
         pass #FIXME move the ship here
         
+=======
+
+    def update(self, *args):
+        pass
+>>>>>>> 1a53d521e037582d11435fc7890fe023ddecd220
 
 class OptionsScreen(Screen):
 
@@ -148,25 +154,25 @@ class OptionsScreen(Screen):
         self.addMenuItem(MenuItem('Calibrate',(int(self.resolution[0]*(1/3.0)),self.resolution[1]//2,)))
         self.addMenuItem(MenuItem('Input Settings',(int(self.resolution[0]*.5),self.resolution[1]//2)))
         self.addMenuItem(MenuItem('Back',(int(self.resolution[0]*(2/3.0)),self.resolution[1]//2)))
-        
+
         self.organizeMenuItems()
 
     def initializeCallbackDict(self):
         self.callbackDict = {}
         self.callbackDict['left_click'] = ('deviceString', self.leftClick)
-        
+
     def organizeMenuItems(self):
         screenWidth = self.resolution[0]
         itemsLength = 0
-        
+
         for item in self.menuItems:
             itemsLength += item.rect.width
-            
+
         if itemsLength >= screenWidth:
             pass#FIXME, Handle this case
         else:
             itemSpace = (screenWidth-itemsLength)/(len(self.menuItems)+1)
-            
+
         nextPosition = itemSpace
         for i in range(len(self.menuItems)):
             self.menuItems[i].rect.topleft = (nextPosition,self.menuItems[i].rect.topleft[1])
@@ -180,7 +186,7 @@ class OptionsScreen(Screen):
         self.title.draw(surf)
         for menuItem in self.menuItems:
             menuItem.draw(surf)
-            
+
     def leftClick(self):
         for item in self.menuItems:
             if item.rect.collidepoint(pygame.mouse.get_pos()):
@@ -190,7 +196,7 @@ class OptionsScreen(Screen):
                     self.play()
                 elif item.text == 'Calibrate':
                     self.displayOptionsScreen()
-        
+
 class ScoreScreen(Screen):
 
     def __init__(self):
