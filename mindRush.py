@@ -23,8 +23,8 @@ window = Window(resolution,
 manager = Manager()
 window.registerManager(manager)
 
-arduinoInput = Biofeedback('/dev/tty.usbmodem621')
-window.addInputDevice(arduinoInput)
+#arduinoInput = Biofeedback('/dev/tty.usbmodem621')
+#window.addInputDevice(arduinoInput)
 
 userInterface = UI(manager)
 #screens must be initialized after the manager and the ui
