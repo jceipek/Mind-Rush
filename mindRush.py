@@ -23,7 +23,8 @@ window = Window(resolution,
 manager = Manager()
 window.registerManager(manager)
 
-arduinoInput = Biofeedback('/dev/ttyACM1')
+arduinoInput = Biofeedback('/dev/ttyACM1',
+                            mindFlexActive=True, eyeCircuitActive=False)
 window.addInputDevice(arduinoInput)
 
 userInterface = UI(manager)
