@@ -6,7 +6,7 @@
 # Redistribution is permitted under the BSD license.  See LICENSE for details.
 #
 
-import pygame
+import pygame, random
 from engine.screen import Screen
 from engine.functions import pathJoin
 from engine.background import Background
@@ -121,6 +121,8 @@ class GameScreen(Screen):
         self.ship = Ship(shipImage,(size[0]/2,size[1]), screenBoundaries = size)
         self.ship.move((0,-self.ship.rect.height/2))
         self.ship.targetPosition = self.ship.position
+        
+        self.boulders = pygame.sprite.Group()
 
 
     def initializeCallbackDict(self):
@@ -139,6 +141,7 @@ class GameScreen(Screen):
     def update(self, *args):
         gameTime, frameTime = args[:2]
         self.ship.update(*args)
+        self.boulders.update(*args)
         
 class GameObject(pygame.sprite.Sprite):
 
@@ -217,6 +220,7 @@ class OptionsScreen(Screen):
         Screen.__init__(self, background, size, ui)
         MenuItem.textCache = Screen.textCache
         MenuItem.resolution = Screen.resolution
+        self.acceleration = ()
 
         self.title = MenuItem('Options',(self.resolution[0]//2,int(self.resolution[1]/4)), scaleSize=1.5)
         self.menuItems = []
