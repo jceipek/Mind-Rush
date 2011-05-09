@@ -107,6 +107,7 @@ class Manager:
         """
         Will execute the function associated with the type of the pygame event passed in.
         """
+        
         if event.type in self.inputDict:
             self.inputDict[event.type](event)
         elif event.type == pygame.USEREVENT:
