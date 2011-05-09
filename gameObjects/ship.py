@@ -21,6 +21,7 @@ class Ship(GameObject):
         self.mask = self.imageCache.getMask(shipPath)
         self.screenBoundaries = screenBoundaries
         self.health = 100
+        self.score = 0
         if screenBoundaries != None:
             self.minXPos = screenBoundaries[0] + self.rect.width/2
             self.maxXPos = screenBoundaries[2] - self.rect.width/2

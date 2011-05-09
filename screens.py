@@ -125,6 +125,8 @@ class GameScreen(Screen):
         Ship.imageCache = Screen.imageCache
         Boulder.imageCache = Screen.imageCache
         BoulderFragment.imageCache = Screen.imageCache
+        Counter.textCache = Screen.textCache
+        Counter.resolution = Screen.resolution
 
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
@@ -143,6 +145,8 @@ class GameScreen(Screen):
 
         self.healthBar = Bar(100,int(size[0]*0.8),int(size[1]*0.05),fullColor=(255,0,0),emptyColor=(0,0,0), borderSize=int(size[1]*0.005), borderColor=(255,255,255))
 
+        self.scoreDisplay = Counter(0,(0,0))
+
     def initializeCallbackDict(self):
         self.callbackDict = {}
         self.callbackDict['look'] = ('deviceString', self.steer)
@@ -160,12 +164,19 @@ class GameScreen(Screen):
                                screenBoundaries=(0,0)+self.resolution)
         self.boulderFragments.add(newBoulderFragment)
 
+    def killBoulder(self, boulder):
+        for ship in self.ships:
+            ship.score += boulder.value
+            self.scoreDisplay.updateValue(ship.score)
+        boulder.kill()
+
     def draw(self, surf):
         Screen.draw(self, surf)
         self.ships.draw(surf)
         self.boulders.draw(surf)
         self.boulderFragments.draw(surf)
         self.healthBar.draw(surf,(0,0))
+        self.scoreDisplay.draw(surf)
 
     def update(self, *args):
         gameTime, frameTime = args[:2]
@@ -182,6 +193,7 @@ class GameScreen(Screen):
                 boulder.kill()
                 if ship.health <= 0:
                     #Kill ship, etc...
+                    print "You are dead"
                     pass
 
         if gameTime >= self.nextBoulderTime:
@@ -189,6 +201,33 @@ class GameScreen(Screen):
             self.boulders.add(Boulder(self, pos=boulderPos, screenBoundaries=(0,0)+self.resolution))
             self.nextBoulderTime = gameTime + random.randint(10,1000)
 
+class Counter:
+
+    def __init__(self, value, pos, scaleSize=None):
+        self.value = value
+        self.pos = pos
+        self.fontname = pathJoin(('fonts','orbitron',
+            'orbitron-black.ttf'))
+        self.size = int(self.resolution[1]*(1/15.0))
+        if scaleSize != None:
+            self.size *= scaleSize
+            self.size = int(self.size)
+        self.color = (255,255,255)
+        self.antialias = True
+        self.updateValue(self.value)
+
+    def updateValue(self, value):
+        self.textCache.clearText(str(self.value), self.fontname,
+            self.size, self.color, antialias=self.antialias)
+        self.value = value
+        self.textSurface = self.textCache.getText(str(self.value),
+                        self.fontname, self.size, self.color,
+                        antialias=self.antialias)
+        self.rect = self.textSurface.get_rect()
+        self.rect.move_ip((int(self.pos[0]),int(self.pos[1])))
+
+    def draw(self, surf):
+        surf.blit(self.textSurface, self.rect)
 
 class OptionsScreen(Screen):
 

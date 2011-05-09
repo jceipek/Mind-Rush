@@ -22,6 +22,7 @@ class Boulder(GameObject):
         self.boundaries = screenBoundaries
         self.acceleration = (0,.001)
         self.damage = 5 #Damage done to ship when it hits
+        self.value = 5 #How many points the boulder is worth
 
 
     def kill(self):
@@ -45,4 +46,4 @@ class Boulder(GameObject):
         #hit the ground
         if self.rect.topleft[1] + self.rect.height > self.boundaries[3]:
 
-            self.kill()
+            self.parent.killBoulder(self)
