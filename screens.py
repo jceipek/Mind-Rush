@@ -19,6 +19,7 @@ from engine.bar import Bar
 from gameObjects.ship import Ship, TestShip
 from gameObjects.boulder import Boulder
 from gameObjects.boulderFragment import BoulderFragment
+from backgrounds import ScrollingCodeBackground
 
 class MenuScreen(Screen):
 
@@ -129,7 +130,7 @@ class GameScreen(Screen):
         Counter.textCache = Screen.textCache
         Counter.resolution = Screen.resolution
 
-        background = Background((0,0,0))
+        background = ScrollingCodeBackground()
         Screen.__init__(self, background, size, ui)
 
         self.ships = pygame.sprite.Group()
@@ -144,9 +145,9 @@ class GameScreen(Screen):
 
         self.boulderFragments = pygame.sprite.Group()
 
-        self.healthBar = Bar(100,int(size[0]*0.8),int(size[1]*0.05),fullColor=(255,0,0),emptyColor=(0,0,0), borderSize=int(size[1]*0.005), borderColor=(255,255,255))
+        self.healthBar = Bar(100,int(size[0]*0.72),int(size[1]*0.05),fullColor=(255,0,0),emptyColor=(0,0,0), borderSize=int(size[1]*0.005), borderColor=(255,255,255))
 
-        self.scoreDisplay = Counter(0,(0,0))
+        self.scoreDisplay = Counter(0,(self.healthBar.surface.get_rect().width,0))
 
     def initializeCallbackDict(self):
         self.callbackDict = {}
@@ -209,6 +210,7 @@ class GameScreen(Screen):
 class Counter:
 
     def __init__(self, value, pos, digits=8, scaleSize=None):
+        self.digits = digits
         self.value = value
         self.pos = pos
         self.fontname = pathJoin(('fonts','orbitron',
@@ -222,14 +224,21 @@ class Counter:
         self.updateValue(self.value)
 
     def updateValue(self, value):
-        self.textCache.clearText(str(self.value), self.fontname,
+        self.textCache.clearText(self.pad(self.value), self.fontname,
             self.size, self.color, antialias=self.antialias)
         self.value = value
-        self.textSurface = self.textCache.getText(str(self.value),
+        self.textSurface = self.textCache.getText(self.pad(self.value),
                         self.fontname, self.size, self.color,
                         antialias=self.antialias)
         self.rect = self.textSurface.get_rect()
         self.rect.move_ip((int(self.pos[0]),int(self.pos[1])))
+
+    def pad(self, value):
+        l = len(str(value))
+        if l <= self.digits:
+            return '0'*(self.digits-l)+str(value)
+        else:
+            return '9'*(self.digits)
 
     def draw(self, surf):
         surf.blit(self.textSurface, self.rect)
@@ -244,9 +253,9 @@ class OptionsScreen(Screen):
 
         self.title = MenuItem('Options',(self.resolution[0]//2,int(self.resolution[1]/4)), scaleSize=1.5)
         self.menuItems = []
-        self.addMenuItem(MenuItem('Calibrate',(int(self.resolution[0]*(1/3.0)),self.resolution[1]//2,)))
-        self.addMenuItem(MenuItem('Input Settings',(int(self.resolution[0]*.5),self.resolution[1]//2)))
         self.addMenuItem(MenuItem('Back',(int(self.resolution[0]*(2/3.0)),self.resolution[1]//2)))
+        self.addMenuItem(MenuItem('Calibrate',(int(self.resolution[0]*(1/3.0)),self.resolution[1]//2,)))
+        #self.addMenuItem(MenuItem('Input Settings',(int(self.resolution[0]*.5),self.resolution[1]//2)))
 
         self.organizeMenuItems()
 
@@ -370,8 +379,11 @@ class CalibrationScreen(Screen):
 
         self.menuItems = []
         self.addMenuItem(MenuItem('You have calibrated your eye circuit',(self.resolution[0]//2,int(self.resolution[1]*.1)),scaleSize=.75))
-        self.addMenuItem(MenuItem('Continue',(int(self.resolution[0]*.3),int(self.resolution[1]*.31)),scaleSize=.75))
+
+
         self.addMenuItem(MenuItem('Retry',(int(self.resolution[0]*.7),int(self.resolution[1]*.31)),scaleSize=.75))
+        self.addMenuItem(MenuItem('Continue',(int(self.resolution[0]*.3),int(self.resolution[1]*.31)),scaleSize=.75))
+
 
     def start(self):
         self.eyePositions = []
