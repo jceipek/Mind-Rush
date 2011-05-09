@@ -120,12 +120,12 @@ class GameScreen(Screen):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
         
-        self.ship = Ship(pos=(size[0]/2,size[1]), screenBoundaries = size)
+        self.ship = Ship(pos=(size[0]/2,size[1]), screenBoundaries=(0,0)+size)
         self.ship.move((0,-self.ship.rect.height/2))
         self.ship.targetPosition = self.ship.position
         
         self.boulders = pygame.sprite.Group()
-        self.boulders.add(Boulder(pos=(size[0]/2,0), screenBoundaries=size))
+        self.nextBoulderTime = 0
 
 
     def initializeCallbackDict(self):
@@ -146,7 +146,12 @@ class GameScreen(Screen):
         gameTime, frameTime = args[:2]
         self.ship.update(*args)
         self.boulders.update(*args)
-        #if gameTime%
+        
+        if gameTime >= self.nextBoulderTime:
+            boulderPos = random.randint(0,self.resolution[0]), 0
+            self.boulders.add(Boulder(pos=boulderPos, screenBoundaries=(0,0)+self.resolution))
+            self.nextBoulderTime = gameTime + random.randint(10,1000)
+            
         
 class GameObject(pygame.sprite.Sprite):
 
@@ -187,11 +192,10 @@ class Ship(GameObject):
         
         GameObject.__init__(self, shipImage, pos, vel)
         self.targetPosition = pos
-        if screenBoundaries == None:
-            self.screenBoundaries = None
-        else:
-            self.screenBoundaries = (self.rect.width/2, screenBoundaries[0] - self.rect.width/2)
-        
+        self.screenBoundaries = screenBoundaries
+        if screenBoundaries != None:
+            self.minXPos = screenBoundaries[0] + self.rect.width/2
+            self.maxXPos = screenBoundaries[2] - self.rect.width/2        
     def update(self, *args):
         gameTime, frameTime = args[:2]
         speed = .006
@@ -210,10 +214,10 @@ class Ship(GameObject):
         
         #don't allow the ship off of the sides of the screen
         if self.screenBoundaries != None:
-            if self.position[0] > self.screenBoundaries[1]:
-                self.position = self.screenBoundaries[1], self.position[1]
-            elif self.position[0] < self.screenBoundaries[0]:
-                self.position = self.screenBoundaries[0], self.position[1]
+            if self.position[0] > self.maxXPos:
+                self.position = self.maxXPos, self.position[1]
+            elif self.position[0] < self.minXPos:
+                self.position = self.minXPos, self.position[1]
         self.moveTo(self.position)
         
 class Boulder(GameObject):
@@ -238,12 +242,13 @@ class Boulder(GameObject):
         GameObject.update(self, *args)
         
         #bounce off of the walls
-        if self.rect.topleft[0] < 0 or \
-            self.rect.topleft[0] + self.rect.width > self.boundaries[0]:
+        if self.rect.topleft[0] < self.boundaries[0] or \
+            self.rect.topleft[0] + self.rect.width > self.boundaries[2]:
                 
             self.velocity = -self.velocity[0], self.velocity[1]
         
-        if self.rect.topleft[1] + self.rect.height > self.boundaries[1]:
+        #hit the ground
+        if self.rect.topleft[1] + self.rect.height > self.boundaries[3]:
             self.kill()
 
 class OptionsScreen(Screen):
