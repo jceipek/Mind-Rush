@@ -81,7 +81,6 @@ class MenuScreen(Screen):
 
     def play(self):
         gameScreen = GameScreen(self.resolution, self._ui)
-        self._ui.clearActiveScreens()
         self._ui.addActiveScreens(gameScreen)
 
     def displayOptionsScreen(self):
@@ -148,6 +147,10 @@ class GameScreen(Screen):
         self.healthBar = Bar(100,int(size[0]*0.72),int(size[1]*0.05),fullColor=(255,0,0),emptyColor=(0,0,0), borderSize=int(size[1]*0.005), borderColor=(255,255,255))
 
         self.scoreDisplay = Counter(0,(self.healthBar.surface.get_rect().width,0))
+        
+        musicPath = pathJoin(('music','Music.ogg'))
+        pygame.mixer.music.load(musicPath)
+        pygame.mixer.music.play(-1)
 
     def initializeCallbackDict(self):
         self.callbackDict = {}
@@ -199,13 +202,19 @@ class GameScreen(Screen):
                 boulder.kill()
                 if ship.health <= 0:
                     #Kill ship, etc...
+                    for ship in self.ships:
+                        deadScreen = DeadScreen(self.resolution, self._ui, ship.score)
+                    self._ui.clearTopScreen()
+                    self._ui.addActiveScreens(deadScreen)
                     print "You are dead"
                     pass
 
         if gameTime >= self.nextBoulderTime:
             boulderPos = random.randint(0,self.resolution[0]), 0
-            self.boulders.add(Boulder(self, pos=boulderPos, screenBoundaries=(0,0)+self.resolution))
-            self.nextBoulderTime = gameTime + random.randint(10,1000)
+            a = (4**random.random()-1)/2
+            boulderVel = (a,abs(1-a))
+            self.boulders.add(Boulder(self, pos=boulderPos, vel=boulderVel, screenBoundaries=(0,0)+self.resolution))
+            self.nextBoulderTime = gameTime + random.randint(10,2000)
 
 class Counter:
 
@@ -242,6 +251,44 @@ class Counter:
 
     def draw(self, surf):
         surf.blit(self.textSurface, self.rect)
+        
+class DeadScreen(Screen):
+
+    def __init__(self, size, ui, score):
+        background = Background((0,0,0))
+        Screen.__init__(self, background, size, ui)
+        MenuItem.textCache = Screen.textCache
+        
+        self.menuItems = []
+        self.title = MenuItem('Game Over',(self.resolution[0]//2,int(self.resolution[1]*.15)), scaleSize=1.5)
+        self.addMenuItem(MenuItem('Score: %d' % (score,),(self.resolution[0]//2, int(self.resolution[1]*.3))))
+        self.addMenuItem(MenuItem('Replay',(int(self.resolution[0]*.3),self.resolution[1]//2)))
+        self.addMenuItem(MenuItem('Main Menu',(int(self.resolution[0]*.7),self.resolution[1]//2)))
+
+    def initializeCallbackDict(self):
+        self.callbackDict = {}
+        self.callbackDict['left_click'] = ('deviceString', self.leftClick)
+
+    def addMenuItem(self,item):
+        self.menuItems.append(item)
+
+    def draw(self, surf):
+        Screen.draw(self, surf)
+        self.title.draw(surf)
+        for menuItem in self.menuItems:
+            menuItem.draw(surf)
+
+    def leftClick(self):
+        for item in self.menuItems:
+            if item.rect.collidepoint(pygame.mouse.get_pos()):
+                if item.text == 'Replay':
+                    self.play()
+                elif item.text == 'Main Menu':
+                    self._ui.clearTopScreen()
+                    
+    def play(self):
+        gameScreen = GameScreen(self.resolution, self._ui)
+        self._ui.addActiveScreens(gameScreen)
 
 class OptionsScreen(Screen):
 

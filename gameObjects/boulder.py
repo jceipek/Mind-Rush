@@ -16,6 +16,16 @@ class Boulder(GameObject):
         boulderImage = self.imageCache.getImage(boulderPath, colorkey='alpha', mask=True)
 
         GameObject.__init__(self, boulderImage, parent, pos, vel)
+        
+        self.minXPos = screenBoundaries[0] + self.rect.width/2
+        self.maxXPos = screenBoundaries[2] - self.rect.width/2
+        
+        if self.position[0] < self.minXPos:
+            self.moveTo((self.minXPos, self.position[1]))
+        elif self.position[0] > self.maxXPos:
+            self.moveTo((self.maxXPos, self.position[1]))
+        self.moveTo((self.position[0],self.position[1]-self.rect.height/2))
+        
         self.mask = self.imageCache.getMask(boulderPath)
         if screenBoundaries == None:
             raise Exception('Boulders must have screen boundaries')
@@ -36,11 +46,12 @@ class Boulder(GameObject):
     def update(self, *args):
         GameObject.update(self, *args)
 
-        #bounce off of the walls
-
-        if self.rect.topleft[0] < self.boundaries[0] or \
-            self.rect.topleft[0] + self.rect.width > self.boundaries[2]:
-
+        #observe wall boundaries
+        if self.position[0] < self.minXPos:
+            self.moveTo((self.minXPos, self.position[1]))
+            self.velocity = -self.velocity[0], self.velocity[1]
+        elif self.position[0] > self.maxXPos:
+            self.moveTo((self.maxXPos, self.position[1]))
             self.velocity = -self.velocity[0], self.velocity[1]
 
         #hit the ground
