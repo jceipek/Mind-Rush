@@ -49,3 +49,21 @@ class Ship(GameObject):
             elif self.position[0] < self.minXPos:
                 self.position = self.minXPos, self.position[1]
         self.moveTo(self.position)
+        
+class TestShip(Ship):
+    def __init__(self, *args, **kwargs):
+        Ship.__init__(self, *args,**kwargs)
+        self.stage = 0
+        self.finished = False
+    def update(self, *args):
+        GameObject.update(self, *args)
+        if self.stage == 0 and self.position[0] < self.minXPos:
+            self.velocity = (-self.velocity[0], self.velocity[1])
+            self.stage = 1
+        elif self.stage == 1 and self.position[0] > self.maxXPos:
+            self.stage = 2
+            self.velocity = (-self.velocity[0], self.velocity[1])
+        elif self.stage == 2 and self.position[0] < (self.minXPos + self.maxXPos)/2:
+            self.stage = 3
+            self.velocity = (0,0)
+            self.finished = True
