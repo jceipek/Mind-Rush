@@ -20,11 +20,41 @@ class ScrollingCodeBackground(Background):
 
         CodeObject.specialText = []
         CodeObject.count = 0
-        for fn in [pathJoin(['engine','altInput.py']),
-                 pathJoin(['engine','background.py'])]:
-            f = open(fn)
-            CodeObject.specialText += f.readlines()
-            f.close()
+        for fn in [pathJoin(['engine','__init__.py']),
+                 pathJoin(['engine','altInput.py']),
+                 pathJoin(['engine','background.py']),
+                 pathJoin(['engine','bar.py']),
+                 pathJoin(['engine','classMethod.py']),
+                 pathJoin(['engine','continuousEvent.py']),
+                 pathJoin(['engine','drawableObject.py']),
+                 pathJoin(['engine','imageCache.py']),
+                 pathJoin(['engine','listener.py']),
+                 pathJoin(['engine','manager.py']),
+                 pathJoin(['engine','potentialObject.py']),
+                 pathJoin(['engine','screen.py']),
+                 pathJoin(['engine','textCache.py']),
+                 pathJoin(['engine','trueProcess.py']),
+                 pathJoin(['engine','ui.py']),
+                 pathJoin(['engine','functions','__init__.py']),
+                 pathJoin(['backgrounds.py']),
+                 pathJoin(['biofeedback.py']),
+                 pathJoin(['inputDevice.py']),
+                 pathJoin(['mindRush.py']),
+                 pathJoin(['screens.py']),
+                 pathJoin(['engine','functions','pathJoin.py']),
+                 pathJoin(['gameObjects','__init__.py']),
+                 pathJoin(['gameObjects','boulder.py']),
+                 pathJoin(['gameObjects','boulderFragment.py']),
+                 pathJoin(['gameObjects','ship.py']),
+                 pathJoin(['gameObjects','gameObject.py']),
+                 pathJoin(['hardware','arduinoEyeAndBrain',
+                 'arduinoEyeAndBrain.pde'])]:
+            try:
+                f = open(fn)
+                CodeObject.specialText += f.readlines()
+                f.close()
+            except:
+                pass
         CodeObject.maxCount = len(CodeObject.specialText)
 
         self.nextCodeTime = 0
