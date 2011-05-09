@@ -21,6 +21,7 @@ class Boulder(GameObject):
             raise Exception('Boulders must have screen boundaries')
         self.boundaries = screenBoundaries
         self.acceleration = (0,.001)
+        self.damage = 5 #Damage done to ship when it hits
 
 
     def kill(self):
@@ -29,7 +30,7 @@ class Boulder(GameObject):
         from math import sin,cos
         for i in xrange(8):
             self.parent.addBoulderFragment(pos=self.position,
-            vel=(cos((2*3.14159)/8.0*i),sin((2*3.14159)/8.0*i)))
+            vel=(cos((2*3.14159)/8.0*i),sin((2*3.14159)/8.0*i)),id=i)
 
     def update(self, *args):
         GameObject.update(self, *args)

@@ -128,10 +128,12 @@ class GameScreen(Screen):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
 
-        self.ship = Ship(self, pos=(size[0]/2,size[1]), screenBoundaries=(0,0)+size)
-
-        self.ship.move((0,-self.ship.rect.height/2))
-        self.ship.targetPosition = self.ship.position
+        self.ships = pygame.sprite.Group()
+        ship = Ship(self, pos=(size[0]/2,size[1]), screenBoundaries=(0,0)+size)
+        self.ships.add(ship) #May change if we add more ships (multiplayer?)
+        for ship in self.ships:
+            ship.move((0,-ship.rect.height/2))
+            ship.targetPosition = ship.position
 
         self.boulders = pygame.sprite.Group()
         self.nextBoulderTime = 0
@@ -145,32 +147,36 @@ class GameScreen(Screen):
 
     def steer(self, event):
         #move the spaceship in this method
-        self.ship.targetPosition = (event.values[0], self.ship.targetPosition[1])
-        pass#self.targetPosition = event.values[0]#the position of the event
+        for ship in self.ships:
+            ship.targetPosition = (event.values[0], ship.targetPosition[1])
 
-    def addBoulderFragment(self, pos=(0,0), vel=(0,0)):
+    def addBoulderFragment(self, pos=(0,0), vel=(0,0), id=0):
         newBoulderFragment = BoulderFragment(self,
                                pos=pos,
                                vel=vel,
+                               id=id,
                                screenBoundaries=(0,0)+self.resolution)
         self.boulderFragments.add(newBoulderFragment)
 
     def draw(self, surf):
         Screen.draw(self, surf)
-        self.ship.draw(surf)
+        self.ships.draw(surf)
         self.boulders.draw(surf)
         self.boulderFragments.draw(surf)
 
     def update(self, *args):
         gameTime, frameTime = args[:2]
-        self.ship.update(*args)
+        self.ships.update(*args)
         self.boulders.update(*args)
         self.boulderFragments.update(*args)
 
-        #For every boulder colliding with the ship,
+        #For every boulder colliding with a ship,
         #kill the boulder & lose health
-        for boulder in self.ship.testMaskCollision(self.boulders):
-            boulder.kill()
+        for ship in self.ships:
+            for boulder in ship.testMaskCollision(self.boulders):
+                ship.health -= boulder.damage
+                print ship.health
+                boulder.kill()
 
         if gameTime >= self.nextBoulderTime:
             boulderPos = random.randint(0,self.resolution[0]), 0
