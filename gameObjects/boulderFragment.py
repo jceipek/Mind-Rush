@@ -12,7 +12,7 @@ from engine.functions import pathJoin
 class BoulderFragment(GameObject):
     def __init__(self, parent, pos=(0,0), vel=(0,0), screenBoundaries = None):
         fragmentPath = pathJoin(('images','fragment.png'))
-        fragmentImage = self.imageCache.getImage(fragmentPath, colorkey='alpha', mask=True)
+        fragmentImage = self.imageCache.getImage(fragmentPath, colorkey='alpha', mask=False)
 
         rect = self.imageCache.getRect(fragmentPath)
 

@@ -167,6 +167,11 @@ class GameScreen(Screen):
         self.boulders.update(*args)
         self.boulderFragments.update(*args)
 
+        #For every boulder colliding with the ship,
+        #kill the boulder & lose health
+        for boulder in self.ship.testMaskCollision(self.boulders):
+            boulder.kill()
+
         if gameTime >= self.nextBoulderTime:
             boulderPos = random.randint(0,self.resolution[0]), 0
             self.boulders.add(Boulder(self, pos=boulderPos, screenBoundaries=(0,0)+self.resolution))

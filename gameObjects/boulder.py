@@ -16,7 +16,7 @@ class Boulder(GameObject):
         boulderImage = self.imageCache.getImage(boulderPath, colorkey='alpha', mask=True)
 
         GameObject.__init__(self, boulderImage, parent, pos, vel)
-
+        self.mask = self.imageCache.getMask(boulderPath)
         if screenBoundaries == None:
             raise Exception('Boulders must have screen boundaries')
         self.boundaries = screenBoundaries

@@ -31,6 +31,13 @@ class GameObject(pygame.sprite.Sprite):
     def draw(self, surf):
         surf.blit(self.image, self.rect)
 
+    def testMaskCollision(self, spriteGroup):
+        if spriteGroup:
+            return pygame.sprite.spritecollide(self, spriteGroup,
+                                           0, pygame.sprite.collide_mask)
+        else:
+            return []
+
     def update(self, *args):
         gameTime, frameTime = args[:2]
         self.velocity = (frameTime*self.acceleration[0]+self.velocity[0],
@@ -38,3 +45,4 @@ class GameObject(pygame.sprite.Sprite):
         self.position = (frameTime*self.velocity[0]+self.position[0],
                         frameTime*self.velocity[1]+self.position[1])
         self.moveTo(self.position)
+

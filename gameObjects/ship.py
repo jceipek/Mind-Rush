@@ -18,7 +18,7 @@ class Ship(GameObject):
 
         GameObject.__init__(self, shipImage, parent, pos, vel)
         self.targetPosition = pos
-
+        self.mask = self.imageCache.getMask(shipPath)
         self.screenBoundaries = screenBoundaries
         if screenBoundaries != None:
             self.minXPos = screenBoundaries[0] + self.rect.width/2

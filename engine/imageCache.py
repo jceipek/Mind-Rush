@@ -41,18 +41,18 @@ class ImageCache:
         mask: setting this to True will allow the image to generate its own mask
         id: used for images that might be duplicated
         """
-        container = self.getImageContainer(imagepath, id=None,
-                                            colorkey=None, mask=False)
+        container = self.getImageContainer(imagepath, id=id,
+                                            colorkey=colorkey, mask=mask)
         return container.getImage()
 
     def getMask(self, imagepath, id=None, colorkey=None, mask=False):
-        container = self.getImageContainer(imagepath, id=None,
-                                            colorkey=None, mask=False)
+        container = self.getImageContainer(imagepath, id=id,
+                                            colorkey=colorkey, mask=mask)
         return container.getMask()
 
     def getRect(self, imagepath, id=None, colorkey=None, mask=False):
-        container = self.getImageContainer(imagepath, id=None,
-                                            colorkey=None, mask=False)
+        container = self.getImageContainer(imagepath, id=id,
+                                            colorkey=colorkey, mask=mask)
         return container.getRect()
 
     def clearImage(self, imagepath, id=None):
