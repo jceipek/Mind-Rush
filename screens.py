@@ -21,7 +21,7 @@ class MenuScreen(Screen):
         MenuItem.resolution = Screen.resolution
 
         self.menuItems = []
-        self.title = MenuItem('MindRush',(self.resolution[0]//2,int(self.resolution[1]/4)), size=40)
+        self.title = MenuItem('MindRush',(self.resolution[0]//2,int(self.resolution[1]/4)), scaleSize=1.5)
         self.addMenuItem(MenuItem('Play',(int(self.resolution[0]*(1/3.0)),self.resolution[1]//2,)))
         self.addMenuItem(MenuItem('Options',(int(self.resolution[0]*.5),self.resolution[1]//2)))
         self.addMenuItem(MenuItem('Exit',(int(self.resolution[0]*(2/3.0)),self.resolution[1]//2)))
@@ -86,20 +86,19 @@ class MenuScreen(Screen):
 
 class MenuItem:
 
-    def __init__(self, text, pos, size=None):
+    def __init__(self, text, pos, scaleSize=None):
         self.text = text
         self.fontname = pathJoin(('fonts','orbitron',
             'orbitron-black.ttf'))
-        if size == None:
-            self.size = int(self.resolution[1]*(1/15.0))
-        else:
-            self.size = size
+        self.size = int(self.resolution[1]*(1/15.0))
+        if scaleSize != None:
+            self.size *= scaleSize
         self.color = (255,255,255)
         self.antialias = True
         self.textSurface = self.textCache.getText(text, self.fontname,
             self.size, self.color, antialias=self.antialias)
         self.rect = self.textSurface.get_rect()
-        self.rect.center = pos
+        self.rect.center = int(pos[0]), int(pos[1])
 
     def draw(self, surf):
         surf.blit(self.textSurface, self.rect)
@@ -116,7 +115,12 @@ class GameScreen(Screen):
     def __init__(self, size, ui):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
-
+        
+        shipPath = pathJoin(('images','ship.png'))
+        shipImage = self.imageCache.getImage(shipPath, colorkey='alpha', mask=True) #FIXME add ship image here
+        self.ship = Ship(shipImage,(size[0]/2,size[1]), screenBoundaries = size)
+        self.ship.move((0,-self.ship.rect.height/2))
+        self.ship.targetPosition = self.ship.position
 
 
     def initializeCallbackDict(self):
@@ -125,15 +129,86 @@ class GameScreen(Screen):
 
     def steer(self, event):
         #move the spaceship in this method
-
-        self.targetPosition = event.values[0]#the position of the event
+        self.ship.targetPosition = (event.values[0], self.ship.targetPosition[1])
+        pass#self.targetPosition = event.values[0]#the position of the event
 
     def draw(self, surf):
         Screen.draw(self, surf)
-        surf.blit(self.textSurface,(0,0))
-
+        self.ship.draw(surf)
+        
     def update(self, *args):
-        pass
+        gameTime, frameTime = args[:2]
+        self.ship.update(*args)
+        
+class GameObject(pygame.sprite.Sprite):
+
+    def __init__(self, image, pos=(0,0), vel=(0,0)):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = image.get_rect()
+        self.rect.center = int(pos[0]), int(pos[1])
+        self.position = pos
+        self.velocity = vel
+        self.acceleration = (0,0)
+        
+    def move(self, delta):
+        self.position = self.position[0]+delta[0], self.position[1]+delta[1]
+        self.rect.center = int(self.position[0]), int(self.position[1])
+        
+    def moveTo(self, pos):
+        self.position = pos
+        print int(pos[0]), int(pos[1])
+        self.rect.center = int(pos[0]), int(pos[1])
+
+    def draw(self, surf):
+        surf.blit(self.image, self.rect)
+        
+    def update(self, *args):
+        gameTime, frameTime = args[:2]
+        self.velocity = (frameTime*self.acceleration[0]+self.velocity[0],
+                        frameTime*self.acceleration[1]+self.velocity[1])
+        self.position = (frameTime*self.velocity[0]+self.position[0],
+                        frameTime*self.velocity[1]+self.position[1])
+        self.moveTo(self.position)
+
+class Ship(GameObject):
+
+    def __init__(self, image, pos=(0,0), vel=(0,0), screenBoundaries=None):
+        GameObject.__init__(self, image, pos, vel)
+        self.targetPosition = pos
+        if screenBoundaries == None:
+            self.screenBoundaries = None
+        else:
+            self.screenBoundaries = (self.rect.width/2, screenBoundaries[0] - self.rect.width/2)
+        
+    def update(self, *args):
+        gameTime, frameTime = args[:2]
+        speed = .006
+        error = self.targetPosition[0]-self.position[0], self.targetPosition[1]-self.position[1]
+        self.velocity = error[0]*speed, error[1]*speed
+        
+        #don't allow the ship to jump over the target position (applicable only at high speeds)
+        nextPos = [frameTime*self.velocity[0]+self.position[0],
+                        frameTime*self.velocity[1]+self.position[1]]
+        nextError = self.targetPosition[0]-nextPos[0], self.targetPosition[1]-nextPos[1]
+        if error[0]*nextError[0] < 0:
+            nextPos[0] = self.targetPosition[0]
+        if error[1]*nextError[1] < 0:
+            nextPos[1] = self.targetPosition[1]
+        self.position = nextPos
+        
+        #don't allow the ship off of the sides of the screen
+        if self.screenBoundaries != None:
+            if self.position[0] > self.screenBoundaries[1]:
+                self.position = self.screenBoundaries[1], self.position[1]
+            elif self.position[0] < self.screenBoundaries[0]:
+                self.position = self.screenBoundaries[0], self.position[1]
+        self.moveTo(self.position)
+        
+class Boulder(GameObject):
+
+    def __init__(self, image, pos=(0,0), vel=(0,0)):
+        GameObject.__init__(self, image, pos, vel)
 
 class OptionsScreen(Screen):
 
@@ -143,7 +218,7 @@ class OptionsScreen(Screen):
         MenuItem.textCache = Screen.textCache
         MenuItem.resolution = Screen.resolution
 
-        self.title = MenuItem('Options',(self.resolution[0]//2,int(self.resolution[1]/4)), size=40)
+        self.title = MenuItem('Options',(self.resolution[0]//2,int(self.resolution[1]/4)), scaleSize=1.5)
         self.menuItems = []
         self.addMenuItem(MenuItem('Calibrate',(int(self.resolution[0]*(1/3.0)),self.resolution[1]//2,)))
         self.addMenuItem(MenuItem('Input Settings',(int(self.resolution[0]*.5),self.resolution[1]//2)))
