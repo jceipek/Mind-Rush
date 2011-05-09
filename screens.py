@@ -208,7 +208,7 @@ class GameScreen(Screen):
 
 class Counter:
 
-    def __init__(self, value, pos, scaleSize=None):
+    def __init__(self, value, pos, digits=8, scaleSize=None):
         self.value = value
         self.pos = pos
         self.fontname = pathJoin(('fonts','orbitron',
@@ -300,15 +300,15 @@ class CalibrationScreen(Screen):
 
         self.ship = TestShip(self, pos=(size[0]/2,size[1]), screenBoundaries=(0,0)+size)
         self.ship.move((0,-self.ship.rect.height/2))
-        
+
         self.menuItems = []
         self.addMenuItem(MenuItem('You are about to calibrate your eye circuit',(self.resolution[0]//2,int(self.resolution[1]*.1)),scaleSize=.75))
         self.addMenuItem(MenuItem('Follow the ship with your eyes',(self.resolution[0]//2,int(self.resolution[1]*.17)),scaleSize=.75))
         self.addMenuItem(MenuItem('Start',(self.resolution[0]//2,int(self.resolution[1]*.31)),scaleSize=.75))
-        
+
         self.shipPositions = []
         self.eyePositions = []
-        
+
         self.running = False
 
     def gatherData(self, event):
@@ -316,7 +316,7 @@ class CalibrationScreen(Screen):
             self.shipPositions.append(self.ship.position[0])
             self.eyePositions.append(event.values[0])
             print 'gathering data'
-    
+
     def initializeCallbackDict(self):
         self.callbackDict = {}
         self.callbackDict['startCalibration'] = ('deviceString', self.start)
@@ -331,12 +331,12 @@ class CalibrationScreen(Screen):
         for menuItem in self.menuItems:
             menuItem.draw(surf)
         self.ship.draw(surf)
-        
+
     def update(self, *args):
         self.ship.update(*args)
         if self.ship.finished:
             self.finish()
-            
+
     def leftClick(self):
         for item in self.menuItems:
             if item.rect.collidepoint(pygame.mouse.get_pos()):
@@ -353,21 +353,21 @@ class CalibrationScreen(Screen):
             for eyeP, shipP in zip(self.eyePositions, self.shipPositions):
                 slopeTot += (eyeP-eyeAve)/(shipP-shipAve)
             slopeAve = slopeTot/len(self.eyePositions)
-            
+
             def getShipPosition(eyePosition):
                 return slopeAve * (eyePosition - eyeAve) + shipAve
-            
+
             self._ui.getShipPosition = getShipPosition
             print 's = %f*(e-%f)+%f' % (slopeAve, eyeAve, shipAve)
-        
+
         else:
             print 'Calibration failed'
         #create the calibration function here
         self._ui.clearTopScreen()
-    
+
     def finish(self):
         self.running = False
-        
+
         self.menuItems = []
         self.addMenuItem(MenuItem('You have calibrated your eye circuit',(self.resolution[0]//2,int(self.resolution[1]*.1)),scaleSize=.75))
         self.addMenuItem(MenuItem('Continue',(int(self.resolution[0]*.3),int(self.resolution[1]*.31)),scaleSize=.75))
@@ -379,9 +379,9 @@ class CalibrationScreen(Screen):
         self.menuItems = []
         if not self.running:
             self.ship.stage = 0
-            self.ship.velocity = (-1,0)
+            self.ship.velocity = (-0.2,0)
             self.running = True
-            
+
 
 class ScoreScreen(Screen):
 

@@ -24,7 +24,7 @@ window = Window(resolution,
 manager = Manager()
 window.registerManager(manager)
 
-arduinoInput = Biofeedback('/dev/ttyACM0',
+arduinoInput = Biofeedback('/dev/tty.usbmodem411',
                             mindFlexActive=False, eyeCircuitActive=True)
 window.addInputDevice(arduinoInput)
 

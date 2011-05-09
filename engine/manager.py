@@ -59,17 +59,17 @@ class Manager:
                 self.eventTypeToString['UserEvent'] = 'UserEvent'
         except:
             raise Exception('Unable to open input configuration file')
-            
+
     def getEventString(self, event):
         if hasattr(event, 'identifier'):
             eventName = event.identifier
         else:
             eventName = pygame.event.event_name(event.type)
-        
+
         return self.eventTypeToString.get(eventName,None)
-            
-            
-                        
+
+
+
     def initializeCaches(self):
         Manager.textCache = TextCache()
         Manager.imageCache = ImageCache()
@@ -107,7 +107,7 @@ class Manager:
         """
         Will execute the function associated with the type of the pygame event passed in.
         """
-        
+
         if event.type in self.inputDict:
             self.inputDict[event.type](event)
         elif event.type == pygame.USEREVENT:
@@ -127,7 +127,7 @@ class Manager:
             string = self.eventTypeToString[eventName]
             if string in self.screenInputDict:
                 self.screenInputDict[string][1]()
-        
+
         #extensible beyond KEYUP and KEYDOWN events to user defined events
         if hasattr(event,'key'):
             keyName = pygame.key.name(event.key)
@@ -158,14 +158,13 @@ class Manager:
         Handles absolute motion events, e.g. MOUSEMOTION
         """
         eventString = self.getEventString(event)
-        
         if eventString != None:
             if eventString in self.screenInputDict:
                 if hasattr(event,'rel'):
-                    self.screenInputDict[eventString][1](ContinuousEvent(event.rel,relative = True))                    
+                    self.screenInputDict[eventString][1](ContinuousEvent(event.rel,relative = True))
                 if hasattr(event,'pos'):
                     self.screenInputDict[eventString][1](ContinuousEvent(event.pos))
-                    
+
                 if hasattr(event,'value'):
                     self.screenInputDict[eventString][1](ContinuousEvent(event.value))
 
