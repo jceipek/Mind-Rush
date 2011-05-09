@@ -236,6 +236,23 @@ class Ship(GameObject):
             elif self.position[0] < self.minXPos:
                 self.position = self.minXPos, self.position[1]
         self.moveTo(self.position)
+        
+class TestShip(Ship):
+    def __init__(*args, **kwargs):
+        Ship.__init__(*args,**kwargs)
+        self.stage = 0
+        self.finished = False
+    def update(self, *args):
+        GameObject.update(self, *args)
+        if self.stage == 0 and self.position[0] < self.minXPos:
+            self.velocity = (-self.velocity[0], self.velocity[1])
+            self.stage = 1
+        elif self.stage == 1 and self.position[0] > self.maxXPos:
+            self.stage = 2
+            self.velocity = (-self.velocity[0], self.velocity[1])
+        elif self.stage == 2 and self.position[0] < (self.minXPos + self.maxXPos)/2:
+            self.stage = 3
+
 
 class Boulder(GameObject):
 
@@ -357,9 +374,50 @@ class OptionsScreen(Screen):
                 if item.text == 'Back':
                     self._ui.clearTopScreen()
                 elif item.text == 'Scores':
-                    self.play()
+                    self.play(self._ui.addActiveScreens(ScoreScreen()))
                 elif item.text == 'Calibrate':
-                    self.displayOptionsScreen()
+                    self._ui.addActiveScreens(CalibrationScreen(self.resolution, self._ui))
+
+class CalibrationScreen(Screen):
+
+    def __init__(self, size, ui):
+        background = Background((0,0,0))
+        Screen.__init__(self, background, size, ui)
+        MenuItem.textCache = Screen.textCache
+        Ship.imageCache = Screen.imageCache
+
+        self.ship = TestShip(self, pos=(size[0]/2,size[1]), screenBoundaries=(0,0)+size)
+        self.ship.move((0,-self.ship.rect.height/2))
+        
+        self.menuItems = []
+        self.addMenuItem(MenuItem('You are about to calibrate your eye circuit',(self.resolution[0]//2,int(self.resolution[1]*.1)),scaleSize=.75))
+        self.addMenuItem(MenuItem('Follow the ship with your eyes',(self.resolution[0]//2,int(self.resolution[1]*.17)),scaleSize=.75))
+        self.addMenuItem(MenuItem('Press the spacebar to continue',(self.resolution[0]//2,int(self.resolution[1]*.24)),scaleSize=.75))
+        
+        self.running = False
+
+    def initializeCallbackDict(self):
+        self.callbackDict = {}
+        self.callbackDict['startCalibration'] = ('deviceString', self.start)
+
+    def addMenuItem(self,item):
+        self.menuItems.append(item)
+
+    def draw(self, surf):
+        Screen.draw(self, surf)
+        for menuItem in self.menuItems:
+            menuItem.draw(surf)
+        self.ship.draw(surf)
+        
+    def update(self, *args):
+        self.ship.update(*args)
+        pass
+
+    def start(self):
+        if not self.running:
+            self.ship.velocity = (.01,0)
+            self.running = True
+            
 
 class ScoreScreen(Screen):
 
