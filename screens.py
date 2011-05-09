@@ -157,6 +157,7 @@ class GameScreen(Screen):
     def initializeCallbackDict(self):
         self.callbackDict = {}
         self.callbackDict['look'] = ('deviceString', self.steer)
+        self.callbackDict['exit'] = ('deviceString', self.exit)
 
     def steer(self, event):
         #move the spaceship in this method
@@ -166,6 +167,10 @@ class GameScreen(Screen):
         else:
             for ship in self.ships:
                 ship.targetPosition = (event.values[0], ship.targetPosition[1])
+    
+    def exit(self):
+        self._ui.clearTopScreen()
+        pygame.mixer.music.stop()
 
     def addBoulderFragment(self, pos=(0,0), vel=(0,0), id=0):
         newBoulderFragment = BoulderFragment(self,
@@ -209,8 +214,7 @@ class GameScreen(Screen):
                         deadScreen = DeadScreen(self.resolution, self._ui, ship.score)
                     self._ui.clearTopScreen()
                     self._ui.addActiveScreens(deadScreen)
-                    print "You are dead"
-                    pass
+                    pygame.mixer.music.stop()
 
         if gameTime >= self.nextBoulderTime:
             boulderPos = random.randint(0,self.resolution[0]), 0

@@ -31,7 +31,7 @@ class Window:
     def openPygame(self,windowTitle):
         pygame.init()
         pygame.display.set_caption(windowTitle)
-        self.displaySurface = pygame.display.set_mode(self.resolution)
+        self.displaySurface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN)
         self.gameClock = pygame.time.Clock()
         self.maxFPS = 35
         self.gameTime = 0
