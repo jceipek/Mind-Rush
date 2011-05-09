@@ -46,3 +46,4 @@ class GameObject(pygame.sprite.Sprite):
                         frameTime*self.velocity[1]+self.position[1])
         self.moveTo(self.position)
 
+

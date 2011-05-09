@@ -127,6 +127,8 @@ class GameScreen(Screen):
         Ship.imageCache = Screen.imageCache
         Boulder.imageCache = Screen.imageCache
         BoulderFragment.imageCache = Screen.imageCache
+        ScrollingCodeBackground.textCache = Screen.textCache
+        ScrollingCodeBackground.resolution = Screen.resolution
         Counter.textCache = Screen.textCache
         Counter.resolution = Screen.resolution
 
@@ -186,6 +188,7 @@ class GameScreen(Screen):
 
     def update(self, *args):
         gameTime, frameTime = args[:2]
+        Screen.update(self, *args)
         self.ships.update(*args)
         self.boulders.update(*args)
         self.boulderFragments.update(*args)

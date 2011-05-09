@@ -46,7 +46,7 @@ class Screen(pygame.Surface):
             Screen.imageCache = imageCache
 
     def update(self, *args):
-        pass
+        self.background.update(self, *args)
 
     def getCallbackDict(self):
         """
