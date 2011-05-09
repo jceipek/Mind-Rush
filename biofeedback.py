@@ -29,9 +29,10 @@ class Arduino:
         self.proc = None
 
     def listen(self, deviceID, mindFlexActive=True, eyeCircuitActive=True):
-        self.mindflexQueue = multiprocessing.Queue(1)
+        self.mindflexQueue = multiprocessing.Queue(11)
         self.eyeCircuitQueue = multiprocessing.Queue(5)
-        self.proc = TrueProcess(self.mindflexReader, deviceID)
+        self.proc = TrueProcess(self.mindflexReader, deviceID,
+                                mindFlexActive, eyeCircuitActive)
 
     def mindflexReader(self, deviceID,
                         mindFlexActive=True, eyeCircuitActive=True):
@@ -159,9 +160,9 @@ class Arduino:
         print("Closed Arduino Process")
 
 class Biofeedback(AltInput):
-    def __init__(self, deviceID):
+    def __init__(self, deviceID, mindFlexActive=True, eyeCircuitActive=True):
         self.arduino = Arduino()
-        self.arduino.listen(deviceID)
+        self.arduino.listen(deviceID, mindFlexActive, eyeCircuitActive)
 
     def poll(self):
         return (not self.arduino.mindflexQueue.empty() or
