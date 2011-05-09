@@ -37,7 +37,7 @@ class ImageCache:
     def getImage(self, imagepath, id=None, colorkey=None, mask=False):
         """
         Used to create/get images from the image cache
-        
+
         mask: setting this to True will allow the image to generate its own mask
         id: used for images that might be duplicated
         """
@@ -53,7 +53,7 @@ class ImageCache:
     def getRect(self, imagepath, id=None, colorkey=None, mask=False):
         container = self.getImageContainer(imagepath, id=None,
                                             colorkey=None, mask=False)
-        return container.getRECT()
+        return container.getRect()
 
     def clearImage(self, imagepath, id=None):
         """

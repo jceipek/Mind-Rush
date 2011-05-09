@@ -118,16 +118,20 @@ class GameScreen(Screen):
     def __init__(self, size, ui):
         Ship.imageCache = Screen.imageCache
         Boulder.imageCache = Screen.imageCache
+        Fragment.imageCache = Screen.imageCache
 
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
 
-        self.ship = Ship(pos=(size[0]/2,size[1]), screenBoundaries = size)
+        self.ship = Ship(self, pos=(size[0]/2,size[1]), screenBoundaries=(0,0)+size)
+
         self.ship.move((0,-self.ship.rect.height/2))
         self.ship.targetPosition = self.ship.position
 
         self.boulders = pygame.sprite.Group()
-        self.boulders.add(Boulder(pos=(size[0]/2,0), screenBoundaries=size))
+        self.nextBoulderTime = 0
+
+        self.fragments = pygame.sprite.Group()
 
 
     def initializeCallbackDict(self):
@@ -139,26 +143,40 @@ class GameScreen(Screen):
         self.ship.targetPosition = (event.values[0], self.ship.targetPosition[1])
         pass#self.targetPosition = event.values[0]#the position of the event
 
+    def addFragment(self, pos=(0,0), vel=(0,0)):
+        newFragment = Fragment(self,
+                               pos=pos,
+                               vel=vel,
+                               screenBoundaries=(0,0)+self.resolution)
+        self.fragments.add(newFragment)
+
     def draw(self, surf):
         Screen.draw(self, surf)
         self.ship.draw(surf)
         self.boulders.draw(surf)
+        self.fragments.draw(surf)
 
     def update(self, *args):
         gameTime, frameTime = args[:2]
         self.ship.update(*args)
         self.boulders.update(*args)
-        #if gameTime%
+        self.fragments.update(*args)
+
+        if gameTime >= self.nextBoulderTime:
+            boulderPos = random.randint(0,self.resolution[0]), 0
+            self.boulders.add(Boulder(self, pos=boulderPos, screenBoundaries=(0,0)+self.resolution))
+            self.nextBoulderTime = gameTime + random.randint(10,1000)
 
 class GameObject(pygame.sprite.Sprite):
 
-    def __init__(self, image, pos=(0,0), vel=(0,0)):
+    def __init__(self, image, parent, pos=(0,0), vel=(0,0)):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = image.get_rect()
         self.rect.center = int(pos[0]), int(pos[1])
         self.position = pos
         self.velocity = vel
+        self.parent = parent
         self.acceleration = (0,0)
 
     def move(self, delta):
@@ -182,17 +200,18 @@ class GameObject(pygame.sprite.Sprite):
 
 class Ship(GameObject):
 
-    def __init__(self, pos=(0,0), vel=(0,0), screenBoundaries=None):
+    def __init__(self, parent, pos=(0,0), vel=(0,0), screenBoundaries=None):
 
         shipPath = pathJoin(('images','ship.png'))
         shipImage = self.imageCache.getImage(shipPath, colorkey='alpha', mask=True)
 
-        GameObject.__init__(self, shipImage, pos, vel)
+        GameObject.__init__(self, shipImage, parent, pos, vel)
         self.targetPosition = pos
-        if screenBoundaries == None:
-            self.screenBoundaries = None
-        else:
-            self.screenBoundaries = (self.rect.width/2, screenBoundaries[0] - self.rect.width/2)
+
+        self.screenBoundaries = screenBoundaries
+        if screenBoundaries != None:
+            self.minXPos = screenBoundaries[0] + self.rect.width/2
+            self.maxXPos = screenBoundaries[2] - self.rect.width/2
 
     def update(self, *args):
         gameTime, frameTime = args[:2]
@@ -212,19 +231,19 @@ class Ship(GameObject):
 
         #don't allow the ship off of the sides of the screen
         if self.screenBoundaries != None:
-            if self.position[0] > self.screenBoundaries[1]:
-                self.position = self.screenBoundaries[1], self.position[1]
-            elif self.position[0] < self.screenBoundaries[0]:
-                self.position = self.screenBoundaries[0], self.position[1]
+            if self.position[0] > self.maxXPos:
+                self.position = self.maxXPos, self.position[1]
+            elif self.position[0] < self.minXPos:
+                self.position = self.minXPos, self.position[1]
         self.moveTo(self.position)
 
 class Boulder(GameObject):
 
-    def __init__(self, pos=(0,0), vel=(0,0), screenBoundaries = None):
+    def __init__(self, parent, pos=(0,0), vel=(0,0), screenBoundaries = None):
         boulderPath = pathJoin(('images','boulder.png'))
         boulderImage = self.imageCache.getImage(boulderPath, colorkey='alpha', mask=True)
 
-        GameObject.__init__(self, boulderImage, pos, vel)
+        GameObject.__init__(self, boulderImage, parent, pos, vel)
 
         if screenBoundaries == None:
             raise Exception('Boulders must have screen boundaries')
@@ -234,27 +253,35 @@ class Boulder(GameObject):
 
     def kill(self):
         GameObject.kill(self)
-        print 'boom'#boulder explosion code goes here
+        #from random import randint
+        from math import sin,cos
+        for i in xrange(8):
+            self.parent.addFragment(pos=self.position,
+            vel=(cos((2*3.14159)/8.0*i),sin((2*3.14159)/8.0*i)))
 
     def update(self, *args):
         GameObject.update(self, *args)
 
         #bounce off of the walls
-        if self.rect.topleft[0] < 0 or \
-            self.rect.topleft[0] + self.rect.width > self.boundaries[0]:
+
+        if self.rect.topleft[0] < self.boundaries[0] or \
+            self.rect.topleft[0] + self.rect.width > self.boundaries[2]:
 
             self.velocity = -self.velocity[0], self.velocity[1]
 
-        if self.rect.topleft[1] + self.rect.height > self.boundaries[1]:
+        #hit the ground
+        if self.rect.topleft[1] + self.rect.height > self.boundaries[3]:
+
             self.kill()
 
 class Fragment(GameObject):
-    def __init__(self, pos=(0,0), vel=(0,0), screenBoundaries = None):
+    def __init__(self, parent, pos=(0,0), vel=(0,0), screenBoundaries = None):
         fragmentPath = pathJoin(('images','fragment.png'))
         fragmentImage = self.imageCache.getImage(fragmentPath, colorkey='alpha', mask=True)
+
         rect = self.imageCache.getRect(fragmentPath)
 
-        GameObject.__init__(self, boulderImage, pos, vel)
+        GameObject.__init__(self, fragmentImage, parent, pos, vel)
 
         if screenBoundaries == None:
             raise Exception('Boulders must have screen boundaries')
@@ -263,7 +290,7 @@ class Fragment(GameObject):
                            screenBoundaries[2]+rect.width,
                            screenBoundaries[3]+rect.height)
 
-        self.acceleration = (0,0)
+        self.acceleration = (0,0.001)
 
 
     def kill(self):
@@ -275,7 +302,6 @@ class Fragment(GameObject):
         #kill when off-screen:
         if ((self.rect.topleft[0] < self.boundaries[0]) or
            (self.rect.topleft[0] + self.rect.width > self.boundaries[2]) or
-           (self.rect.topleft[1] < self.boundaries[1]) or
            (self.rect.topleft[1] + self.rect.height > self.boundaries[3])):
             self.kill()
 
