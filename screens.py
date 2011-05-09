@@ -14,6 +14,7 @@ from engine.functions import pathJoin
 from engine.background import Background
 
 #For GameScreen:
+from engine.bar import Bar
 from gameObjects.ship import Ship
 from gameObjects.boulder import Boulder
 from gameObjects.boulderFragment import BoulderFragment
@@ -140,6 +141,7 @@ class GameScreen(Screen):
 
         self.boulderFragments = pygame.sprite.Group()
 
+        self.healthBar = Bar(100,int(size[0]*0.8),int(size[1]*0.05),fullColor=(255,0,0),emptyColor=(0,0,0), borderSize=int(size[1]*0.005), borderColor=(255,255,255))
 
     def initializeCallbackDict(self):
         self.callbackDict = {}
@@ -163,6 +165,7 @@ class GameScreen(Screen):
         self.ships.draw(surf)
         self.boulders.draw(surf)
         self.boulderFragments.draw(surf)
+        self.healthBar.draw(surf,(0,0))
 
     def update(self, *args):
         gameTime, frameTime = args[:2]
@@ -175,8 +178,11 @@ class GameScreen(Screen):
         for ship in self.ships:
             for boulder in ship.testMaskCollision(self.boulders):
                 ship.health -= boulder.damage
-                print ship.health
+                self.healthBar.updateBarWithValue(ship.health)
                 boulder.kill()
+                if ship.health <= 0:
+                    #Kill ship, etc...
+                    pass
 
         if gameTime >= self.nextBoulderTime:
             boulderPos = random.randint(0,self.resolution[0]), 0
