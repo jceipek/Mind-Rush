@@ -115,7 +115,7 @@ class GameScreen(Screen):
     def __init__(self, size, ui):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
-        
+
         shipPath = pathJoin(('images','ship.png'))
         shipImage = self.imageCache.getImage(shipPath, colorkey='alpha', mask=True) #FIXME add ship image here
         self.ship = Ship(shipImage,(size[0]/2,size[1]), screenBoundaries = size)
@@ -135,11 +135,11 @@ class GameScreen(Screen):
     def draw(self, surf):
         Screen.draw(self, surf)
         self.ship.draw(surf)
-        
+
     def update(self, *args):
         gameTime, frameTime = args[:2]
         self.ship.update(*args)
-        
+
 class GameObject(pygame.sprite.Sprite):
 
     def __init__(self, image, pos=(0,0), vel=(0,0)):
@@ -150,11 +150,11 @@ class GameObject(pygame.sprite.Sprite):
         self.position = pos
         self.velocity = vel
         self.acceleration = (0,0)
-        
+
     def move(self, delta):
         self.position = self.position[0]+delta[0], self.position[1]+delta[1]
         self.rect.center = int(self.position[0]), int(self.position[1])
-        
+
     def moveTo(self, pos):
         self.position = pos
         print int(pos[0]), int(pos[1])
@@ -162,7 +162,7 @@ class GameObject(pygame.sprite.Sprite):
 
     def draw(self, surf):
         surf.blit(self.image, self.rect)
-        
+
     def update(self, *args):
         gameTime, frameTime = args[:2]
         self.velocity = (frameTime*self.acceleration[0]+self.velocity[0],
@@ -180,13 +180,13 @@ class Ship(GameObject):
             self.screenBoundaries = None
         else:
             self.screenBoundaries = (self.rect.width/2, screenBoundaries[0] - self.rect.width/2)
-        
+
     def update(self, *args):
         gameTime, frameTime = args[:2]
         speed = .006
         error = self.targetPosition[0]-self.position[0], self.targetPosition[1]-self.position[1]
         self.velocity = error[0]*speed, error[1]*speed
-        
+
         #don't allow the ship to jump over the target position (applicable only at high speeds)
         nextPos = [frameTime*self.velocity[0]+self.position[0],
                         frameTime*self.velocity[1]+self.position[1]]
@@ -196,7 +196,7 @@ class Ship(GameObject):
         if error[1]*nextError[1] < 0:
             nextPos[1] = self.targetPosition[1]
         self.position = nextPos
-        
+
         #don't allow the ship off of the sides of the screen
         if self.screenBoundaries != None:
             if self.position[0] > self.screenBoundaries[1]:
@@ -204,7 +204,7 @@ class Ship(GameObject):
             elif self.position[0] < self.screenBoundaries[0]:
                 self.position = self.screenBoundaries[0], self.position[1]
         self.moveTo(self.position)
-        
+
 class Boulder(GameObject):
 
     def __init__(self, image, pos=(0,0), vel=(0,0)):
