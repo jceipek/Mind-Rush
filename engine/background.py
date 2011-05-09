@@ -19,6 +19,7 @@ class Background:
         if type(self.bg) == tuple:
             surf.fill(self.bg)
         else:
+            surf.fill((0,0,0))
             self.bg.draw(surf)
 
     def update(self, *args):

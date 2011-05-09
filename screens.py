@@ -149,7 +149,7 @@ class GameScreen(Screen):
         self.healthBar = Bar(100,int(size[0]*0.72),int(size[1]*0.05),fullColor=(255,0,0),emptyColor=(0,0,0), borderSize=int(size[1]*0.005), borderColor=(255,255,255))
 
         self.scoreDisplay = Counter(0,(self.healthBar.surface.get_rect().width,0))
-        
+
         musicPath = pathJoin(('music','Music.ogg'))
         pygame.mixer.music.load(musicPath)
         pygame.mixer.music.play(-1)
@@ -217,7 +217,7 @@ class GameScreen(Screen):
             a = (4**random.random()-1)/2
             boulderVel = (a,abs(1-a))
             self.boulders.add(Boulder(self, pos=boulderPos, vel=boulderVel, screenBoundaries=(0,0)+self.resolution))
-            self.nextBoulderTime = gameTime + random.randint(10,2000)
+            self.nextBoulderTime = gameTime + random.randint(200,1000)
 
 class Counter:
 
@@ -254,14 +254,14 @@ class Counter:
 
     def draw(self, surf):
         surf.blit(self.textSurface, self.rect)
-        
+
 class DeadScreen(Screen):
 
     def __init__(self, size, ui, score):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
         MenuItem.textCache = Screen.textCache
-        
+
         self.menuItems = []
         self.title = MenuItem('Game Over',(self.resolution[0]//2,int(self.resolution[1]*.15)), scaleSize=1.5)
         self.addMenuItem(MenuItem('Score: %d' % (score,),(self.resolution[0]//2, int(self.resolution[1]*.3))))
@@ -288,7 +288,7 @@ class DeadScreen(Screen):
                     self.play()
                 elif item.text == 'Main Menu':
                     self._ui.clearTopScreen()
-                    
+
     def play(self):
         gameScreen = GameScreen(self.resolution, self._ui)
         self._ui.addActiveScreens(gameScreen)
@@ -374,7 +374,6 @@ class CalibrationScreen(Screen):
         if self.running:
             self.shipPositions.append(self.ship.position[0])
             self.eyePositions.append(event.values[0])
-            print 'gathering data'
 
     def initializeCallbackDict(self):
         self.callbackDict = {}

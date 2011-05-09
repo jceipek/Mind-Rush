@@ -17,11 +17,15 @@ class ScrollingCodeBackground(Background):
         CodeObject.resolution = self.resolution
         bg = pygame.sprite.Group()
 
-        f = open("old/mindRush.py")
-        CodeObject.specialText = f.readlines()
-        CodeObject.maxCount = len(CodeObject.specialText)
+
+        CodeObject.specialText = []
         CodeObject.count = 0
-        f.close()
+        for fn in [pathJoin(['engine','altInput.py']),
+                 pathJoin(['engine','background.py'])]:
+            f = open(fn)
+            CodeObject.specialText += f.readlines()
+            f.close()
+        CodeObject.maxCount = len(CodeObject.specialText)
 
         self.nextCodeTime = 0
 
