@@ -17,6 +17,7 @@ class MenuScreen(Screen):
         background = Background((0,0,0))
         Screen.__init__(self, background, size, ui)
         MenuItem.textCache = Screen.textCache
+        MenuItem.imageCache = Screen.imageCache
         MenuItem.resolution = Screen.resolution
 
         self.menuItems = []
@@ -40,7 +41,7 @@ class MenuScreen(Screen):
         self.title.draw(surf)
         for menuItem in self.menuItems:
             menuItem.draw(surf)
-            
+
     def leftClick(self):
         for item in self.menuItems:
             if item.rect.collidepoint(pygame.mouse.get_pos()):
