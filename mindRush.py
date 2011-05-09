@@ -13,8 +13,8 @@ from engine.window import Window
 from biofeedback import Biofeedback
 from screens import MenuScreen
 
-#resolution = (640,480)
-resolution = (1440,900)
+resolution = (640,480)
+#resolution = (1440,900)
 
 
 window = Window(resolution,
