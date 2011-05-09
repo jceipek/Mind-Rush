@@ -21,7 +21,7 @@ class MenuScreen(Screen):
         MenuItem.resolution = Screen.resolution
 
         self.menuItems = []
-        self.title = MenuItem('MindRush',(self.resolution[0]//2,int(self.resolution[1]/4)), size=40)
+        self.title = MenuItem('MindRush',(self.resolution[0]//2,int(self.resolution[1]/4)), sizeScale=)
         self.addMenuItem(MenuItem('Play',(int(self.resolution[0]*(1/3.0)),self.resolution[1]//2,)))
         self.addMenuItem(MenuItem('Options',(int(self.resolution[0]*.5),self.resolution[1]//2)))
         self.addMenuItem(MenuItem('Exit',(int(self.resolution[0]*(2/3.0)),self.resolution[1]//2)))
@@ -86,14 +86,13 @@ class MenuScreen(Screen):
 
 class MenuItem:
 
-    def __init__(self, text, pos, size=None):
+    def __init__(self, text, pos, scaleSize=None):
         self.text = text
         self.fontname = pathJoin(('fonts','orbitron',
             'orbitron-black.ttf'))
-        if size == None:
-            self.size = int(self.resolution[1]*(1/15.0))
-        else:
-            self.size = size
+        self.size = int(self.resolution[1]*(1/15.0))
+        if scaleSize != None:
+            self.size *= scaleSize
         self.color = (255,255,255)
         self.antialias = True
         self.textSurface = self.textCache.getText(text, self.fontname,
@@ -132,7 +131,9 @@ class GameScreen(Screen):
         Screen.draw(self, surf)
         surf.blit(self.textSurface,(0,0))
         
-    def update(self, *args)
+    def update(self, *args):
+        pass #FIXME move the ship here
+        
 
 class OptionsScreen(Screen):
 
