@@ -57,13 +57,13 @@ class TestShip(Ship):
         self.finished = False
     def update(self, *args):
         GameObject.update(self, *args)
-        if self.stage == 0 and self.position[0] < self.minXPos:
+        if (self.stage == 0 or self.stage == 2) and self.position[0] < self.minXPos:
             self.velocity = (-self.velocity[0], self.velocity[1])
-            self.stage = 1
-        elif self.stage == 1 and self.position[0] > self.maxXPos:
-            self.stage = 2
+            self.stage += 1
+        elif (self.stage == 1 or self.stage == 3) and self.position[0] > self.maxXPos:
+            self.stage += 1
             self.velocity = (-self.velocity[0], self.velocity[1])
-        elif self.stage == 2 and self.position[0] < (self.minXPos + self.maxXPos)/2:
-            self.stage = 3
+        elif self.stage == 4 and self.position[0] < (self.minXPos + self.maxXPos)/2:
+            self.stage += 1
             self.velocity = (0,0)
             self.finished = True
