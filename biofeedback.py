@@ -29,8 +29,8 @@ class Arduino:
         self.proc = None
 
     def listen(self, deviceID, mindFlexActive=True, eyeCircuitActive=True):
-        #eventReader,eventPipe = multiprocessing.Pipe()
-        self.eventQueue = multiprocessing.Queue(5)
+        self.mindflexQueue = multiprocessing.Queue(1)
+        self.eyeCircuitQueue = multiprocessing.Queue(5)
         self.proc = TrueProcess(self.mindflexReader, deviceID)
 
     def mindflexReader(self, deviceID,
@@ -86,37 +86,37 @@ class Arduino:
 
                     if self.quality != newQuality:
                         self.quality = newQuality
-                        self.put(('Arduino_quality',self.quality))
+                        self.putMindflexMessage(('Arduino_quality',self.quality))
                     if self.attention != newAttention:
                         self.attention = newAttention
-                        self.put(('Arduino_attention',self.attention))
+                        self.putMindflexMessage(('Arduino_attention',self.attention))
                     if self.meditation != newMeditation:
                         self.meditation = newMeditation
                         self.put(('Arduino_meditation',self.meditation))
                     if self.delta != newDelta:
                         self.delta = newDelta
-                        self.put(('Arduino_delta',self.delta))
+                        self.putMindflexMessage(('Arduino_delta',self.delta))
                     if self.theta != newTheta:
                         self.theta = newTheta
-                        self.put(('Arduino_theta',self.theta))
+                        self.putMindflexMessage(('Arduino_theta',self.theta))
                     if self.lowAlpha != newLowAlpha:
                         self.lowAlpha = newLowAlpha
-                        self.put(('Arduino_lowAlpha',self.lowAlpha))
+                        self.putMindflexMessage(('Arduino_lowAlpha',self.lowAlpha))
                     if self.highAlpha != newHighAlpha:
                         self.highAlpha = newHighAlpha
-                        self.put(('Arduino_highAlpha',self.highAlpha))
+                        self.putMindflexMessage(('Arduino_highAlpha',self.highAlpha))
                     if self.lowBeta != newLowBeta:
                         self.lowBeta = newLowBeta
-                        self.put(('Arduino_lowBeta',self.lowBeta))
+                        self.putMindflexMessage(('Arduino_lowBeta',self.lowBeta))
                     if self.highBeta != newHighBeta:
                         self.highBeta = newHighBeta
-                        self.put(('Arduino_highBeta',self.highBeta))
+                        self.putMindflexMessage(('Arduino_highBeta',self.highBeta))
                     if self.lowGamma != newLowGamma:
                         self.lowGamma = newLowGamma
-                        self.put(('Arduino_lowGamma',self.lowGamma))
+                        self.putMindflexMessage(('Arduino_lowGamma',self.lowGamma))
                     if self.highGamma != newHighGamma:
                         self.highGamma = newHighGamma
-                        self.put(('Arduino_highGamma',self.highGamma))
+                        self.putMindflexMessage(('Arduino_highGamma',self.highGamma))
                 except:
                     print line
                     print "Caught Mindflex serial error!"
@@ -130,9 +130,11 @@ class Arduino:
 
                     if self.eyeSignal != newEyeSignal:
                         self.eyeSignal = newEyeSignal
-                        self.put(('Arduino_eyeValue',self.eyeSignal))
+                        self.putEyeCircuitMessage(('Arduino_eyeValue',
+                                                    self.eyeSignal))
 
-                except:
+                except Exception as e:
+                    print e
                     print "Caught EMG circuit serial error!",line
 
 
@@ -142,10 +144,15 @@ class Arduino:
         except:
             print "Unable to close serial connection to Arduino!"
 
-    def put(self, message):
-        while self.eventQueue.full():
-            self.eventQueue.get()
-        self.eventQueue.put(message)
+    def putEyeCircuitMessage(self, message):
+        while self.eyeCircuitQueue.full():
+            self.eyeCircuitQueue.get()
+        self.eyeCircuitQueue.put(message)
+
+    def putMindflexMessage(self, message):
+        while self.mindflexQueue.full():
+            self.mindflexQueue.get()
+        self.mindflexQueue.put(message)
 
     def deactivate(self):
         self.active.value = 0
@@ -157,15 +164,29 @@ class Biofeedback(AltInput):
         self.arduino.listen(deviceID)
 
     def poll(self):
-        return not self.arduino.eventQueue.empty()
+        return (not self.arduino.mindflexQueue.empty() or
+                not self.arduino.eyeCircuitQueue.empty())
 
-    def getEvent(self):
-        #reading = self.listener.recv()
-        reading = self.arduino.eventQueue.get()
-        identifier = reading[0]
-        value = reading[1]
-        discrete = False #All of the bio-feedback events we use are continuous values
-        return self.makeEvent(identifier, value, discrete)
+    def getEvents(self):
+        events = []
+
+        if not self.arduino.mindflexQueue.empty():
+            reading = self.arduino.mindflexQueue.get()
+            identifier = reading[0]
+            value = reading[1]
+            discrete = False #All of the bio-feedback events we use are continuous values
+            mindflexReading = self.makeEvent(identifier, value, discrete)
+            events.append(mindflexReading)
+
+        if not self.arduino.eyeCircuitQueue.empty():
+            reading = self.arduino.eyeCircuitQueue.get()
+            identifier = reading[0]
+            value = reading[1]
+            discrete = False #All of the bio-feedback events we use are continuous values
+            eyeCircuitReading = self.makeEvent(identifier, value, discrete)
+            events.append(eyeCircuitReading)
+
+        return events
 
     def stop(self):
         self.arduino.deactivate()
