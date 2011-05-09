@@ -351,7 +351,7 @@ class CalibrationScreen(Screen):
             shipAve = math.fsum(self.shipPositions)/len(self.shipPositions)
             slopeTot = 0
             for eyeP, shipP in zip(self.eyePositions, self.shipPositions):
-                slopeTot += (eyeP-eyeAve)/(shipP-shipAve)
+                slopeTot += (shipP-shipAve)/(eyeP-eyeAve)
             slopeAve = slopeTot/len(self.eyePositions)
 
             def getShipPosition(eyePosition):
