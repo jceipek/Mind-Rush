@@ -10,7 +10,6 @@ from engine.ui import UI
 from engine.manager import Manager
 from engine.window import Window
 
-from biofeedback import Biofeedback
 from screens import MenuScreen
 
 #resolution = (640,480)
@@ -33,6 +32,7 @@ window.registerManager(manager)
 #         For instructions on obtaining this string, look through
 #         http://arduino.cc/en/Guide/HomePage
 #-------------------------------------------------------------------------
+#from biofeedback import Biofeedback
 #arduinoInput = Biofeedback('/dev/tty.usbmodem621',
 #                            mindFlexActive=False, eyeCircuitActive=True)
 #window.addInputDevice(arduinoInput)
