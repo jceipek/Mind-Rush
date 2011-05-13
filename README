@@ -29,6 +29,7 @@ will be easy to add in the future)
 - pyserial
 - An Arduino (we used the Arduino UNO) with a USB cable connected to a 
   battery-powered laptop
+- The Arduino Brain Library (https://github.com/kitschpatrol/Arduino-Brain-Library)
 - The circuit detailed in ./eyeCircuit.png. It can be built on a breadboard.
 
 ----------------------------------------------------------------------------
@@ -64,6 +65,10 @@ is complete or appropriate for any particular application.
 2. Connect the left_eye input to an electrode on your left temple.
 3. Connect the right_eye input to an electrode on your right temple. 
 4. Connect the forehead input to an electrode on your forehead.
+5. Uploa the code in ./hardware/arduinoEyeAndBrain/arduinoEyeAndBrain.pde to the Arduino 
+   (it depends on https://github.com/kitschpatrol/Arduino-Brain-Library for the unused 
+    EEG component. Having this installed will cause no problems if you have no EEG, but
+    you can easily modify the Arduino code not to rely on the brain library)
 5. Connect the Arduino A0 pin to the output in the diagram.
 6. Connect the Arduino's 5V power rail to the circuit. This requires basic
    circuitry experience because the circuit requires 2.5V power at several
